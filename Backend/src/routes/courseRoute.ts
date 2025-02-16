@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import cors from 'cors';
 import OpenAI from "openai";
+import config from "../modules/dots";
+
 // import { db } from '../database/db';
 
 import Transcriptor from 'youtube-video-transcript';
 
 
 const router = Router();
-const openai = new OpenAI();
+const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
 
 router.options('/course', cors({ origin: '*' }));  // Preflight support
 
@@ -19,46 +21,76 @@ interface DataItem {
 }
 
 // ChatGPT prompt
-const prompt = `You will receive a body of text which is the transcription of an educational video. You will summarize and condense key concepts into different topics based on the course name and the transcription. DO NOT provide more than 10 topics. You will also provide 5 quiz questions based on the concepts in the transcription for each topic. You must format your output as a JSON file like so:
+const prompt = `You will receive a body of text which is the transcription of an educational video. You will summarize and condense key concepts into different sections based on the course name and the transcription. DO NOT provide more than 10 sections. You will also provide 5 comprehensive multiple-choice questions and answers (CORRESPONDING TO THE LETTER OF CORRECT ANSWER) based on the concepts in the transcription for each topic. You must format your output as a JSON file like so:
+
+(EXAMPLE)
 {
     "course_name": "COURSE_NAME",
     "course_summary": "COURSE_SUMMARY",
-    "topics": [
+    "sections": [
         {
-            "topic": "TOPIC_NAME",
-            "summary": "TOPIC_SUMMARY",
+            "section": "SECTION_NAME",
+            "summary": "SECTION_SUMMARY",
             "questions" : [
-                "QUESTION 1",
-                "QUESTION 2",
-                "QUESTION 3",
-                "QUESTION 4",
-                "QUESTION 5"
+                "q1" : [
+                    "question" : "QUESTION",
+                    "answer" : "ANSWER"
+                    "a" : "OPTION1",
+                    "b" : "OPTION2",
+                    "c" : "OPTION3",
+                    "d" : "OPTION4"
+                ]
+                // ** UP TO q5 ** //
             ]
         }
     ],
 }
-
+DO NOT ADD ANY NEW LINE CHARACTERS OR ANY ADDITIONAL CHARACTERS.
 NOTE THAT each course has multiple topics in "topics".
 `;
 
 // Takes a transcript of a given youtube video and generates a course from it. 
 router.post('/course', async (req, res) => {
     try {
-        const title = req.body.title;
-        const link = req.body.link; 
+        // const title = req.body.title;
+        // const link = req.body.link; 
         var transcription;
+
         // Obtain transcription from youtube video
-        // Transcriptor.getTranscript('https://www.youtube.com/watch?v=JBm0Tz4wDqU')
-        Transcriptor.getTranscript(link)
-        .then((transcript: any) => {
-            transcription = (transcript.data as DataItem[]).map((item) => item.text).join(' ');
-            console.log(transcription);
-        })
-        .catch((err: any) => {
-            console.error('Error fetching transcript:', err);
-        });
+        const result = await Transcriptor.getTranscript('https://www.youtube.com/watch?v=8geaZ0katu0')
+        // @ts-ignore
+        console.log(result.data);
+        // @ts-ignore
+        if (result != null && Array.isArray(result.data)) {
+            // @ts-ignore
+            transcription = (result.data.text as DataItem[]).map((item) => item.text).join(' ');
+        } else {
+            const failure = "Failed to retrieve transcription for the video."
+            console.log(failure);
+            res.status(500).send({ message: failure});
+            return;
+        }
 
         // Query ChatGPT 4o-mini
+        if (transcription != null) {
+            const completion = await openai.chat.completions.create({
+                model: "gpt-4o-mini",
+                messages: [
+                    { role: "system", content: prompt },
+                    { 
+                        role: "user",
+                        content: transcription,
+                    },
+                ],
+                store: false,
+            });
+            console.log(completion.choices[0].message);
+        } else {
+            const failure = "Failed to retrieve transcription for the video."
+            console.log(failure);
+            res.status(500).send({ message: failure});
+            return;
+        }
         
         res.status(200).send({ message : "Course successfully generated." });
     } catch (error) {
