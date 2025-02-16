@@ -1,24 +1,37 @@
 import express from 'express';
 import bookRoutes from './routes/bookRoutes';
+
 import authRoutes from './routes/authRoutes';
 import courseRoutes from './routes/courseRoutes';
 
 import cors from 'cors';
 import { setupDatabase } from './database/dbSetup';
 
-const router = express();
-
+const app = express();  // Use app instead of router for clarity
 const PORT = 3000;
 
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
-router.use(cors());
+// Enable CORS for all origins
+app.use(cors());
+app.options('*', cors());
 
+// Middleware to parse JSON and URL-encoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Setup the database
 setupDatabase();
 
-router.get('/', (req, res) => {
+// API routes
+app.use('/api', bookRoutes);
+app.use('/api', courseRoute);
+
+// Base route
+app.get('/', (req, res) => {
   res.send('Successful response.');
 });
+
+// Start the server
+app.listen(PORT, () => {
 
 router.use('/api', bookRoutes);
 
