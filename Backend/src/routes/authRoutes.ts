@@ -55,10 +55,11 @@ router.post('/auth/tokenLogin', async (req, res) => {
 
 router.post('/auth/createAccount', async (req, res) => {
     try {
-        console.log(req.body)
-        const { email, username , pwd } = req.body;
+        const email = req.body.email as String;
+        const name = req.body.name as String;
+        const pwd = req.body.pwd as String;
 
-        if (!username || !email || !pwd) {
+        if (!name || !email || !pwd) {
             return res.status(400).send({ message: 'Missing required fields.' });
         }
 
@@ -67,7 +68,12 @@ router.post('/auth/createAccount', async (req, res) => {
             return res.status(400).send({ message: 'Email already exists.' });
         }
 
-        await db('Users').insert({ username, email, pwd });
+        await db('Users')
+            .insert({ 
+                'name': name,
+                'email': email, 
+                'pwd': pwd 
+            });
 
         const user = await db('Users')
             .select('u_id', 'name')
@@ -88,6 +94,7 @@ router.post('/auth/createAccount', async (req, res) => {
 
         res.status(200).send(outputData);
     } catch (error) {
+        console.log(error);
         res.status(500).send({ message: 'Internal server error.' })
     }
 })

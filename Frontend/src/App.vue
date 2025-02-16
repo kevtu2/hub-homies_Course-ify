@@ -66,11 +66,12 @@ async function tryLogin() {
   try {
     const response = await axios.post('http://localhost:3000/api/auth/login', {
       email: loginEmailInput.value,
-      password: loginPasswordInput.value,
+      pwd: loginPasswordInput.value,
     });
+    
     if(response.data != null) {
       Cookies.set('token', response.data.token);
-      authStore.login(response.data.username, response.data.u_id);
+      authStore.login(response.data.name, response.data.u_id);
     }
   } catch (error) {
     console.error(error);
@@ -84,13 +85,20 @@ async function tryStartupLogin() {
     const response = await axios.post('http://localhost:3000/api/auth/tokenLogin', {
       token: Cookies.get('token')
     });
+
     if(response.data != null) {
+      
       Cookies.set('token', response.data.token);  
-      authStore.login(response.data.username, response.data.u_id);
+      authStore.login(response.data.name, response.data.u_id);
     }
   } catch (error) {
     console.log(error);
   }
+}
+
+async function tryLogout() {
+  Cookies.remove('token');
+  authStore.logout();
 }
 
 const createAccountDialogVisible = ref(false);
@@ -101,12 +109,12 @@ async function tryCreateAccount() {
   try {
     const response = await axios.post('http://localhost:3000/api/auth/createAccount', {
       email: createEmailInput.value,
-      username: createUsernameInput.value,
-      password: createPasswordInput.value,
+      name: createUsernameInput.value,
+      pwd: createPasswordInput.value,
     })
     if(response.data != null) {
       Cookies.set('token', response.data.token);
-      authStore.login(response.data.username, response.data.u_id);
+      authStore.login(response.data.name, response.data.u_id);
     }
   } catch (error) {
     console.error(error); 
@@ -130,7 +138,10 @@ const u_id = computed(() => authStore.u_id);
           </a>
       </template>
       <template #end>
-        <div v-if="isLoggedIn">{{ username }}</div>
+        <div v-if="isLoggedIn">
+          {{ username }}
+          <Button class="ml-2" @click="tryLogout" severity="secondary" icon="pi pi-sign-out" />
+        </div>
         <div class="flex gap-2">
           <Button v-if="!isLoggedIn" @click="createAccountDialogVisible = true" severity="secondary" icon="pi pi-user-plus" />
           <Button v-if="!isLoggedIn" @click="loginDialogVisible = true" severity="secondary" icon="pi pi-sign-in" />
