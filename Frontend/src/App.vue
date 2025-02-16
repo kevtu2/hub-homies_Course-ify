@@ -127,7 +127,7 @@ async function getCourses() {
   try {
     const courseIds = await axios.get('http://localhost:3000/api/courses/getIds');
     for (let i = 0; i < Object.keys(courseIds.data).length; i++) {
-      addCourseToMenu(courseIds.data[i]['c_id'], `/course/${courseIds.data[i]['c_id']}`);
+      addCourseToMenu(courseIds.data[i]['title'], `/course/${courseIds.data[i]['c_id']}`);
     }
     console.log("Retrieved courses successfully!");
   } catch (error) {
