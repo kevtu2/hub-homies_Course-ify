@@ -24,7 +24,7 @@ interface QuestionJson {
   d: string;
 }
 
-async function addCourseOuputToDatabase(theCourseJson: CourseJson) {
+export async function addCourseOutputToDatabase(theCourseJson: CourseJson) {
   let course_name = theCourseJson['course_name'];
   let course_summary = theCourseJson['course_summary'];
   let sections = theCourseJson['sections'];

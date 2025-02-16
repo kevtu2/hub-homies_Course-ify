@@ -4,8 +4,8 @@ import cors from 'cors';
 import OpenAI from 'openai';
 import config from '../modules/dots';
 import { getDataOfTokenIfAvailable } from '../middleware/tokenCheckerMiddleware';
-
 import { YoutubeTranscript } from 'youtube-transcript';
+import { addCourseOutputToDatabase } from '../modules/dbAddHelper';
 
 const router = Router();
 const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
@@ -31,7 +31,7 @@ interface Course {
 }
 
 // ChatGPT prompt
-const prompt = `You will receive a body of text which is the transcription of an educational video. You will summarize and condense key concepts into different sections based on the course name and the transcription. DO NOT provide more than 10 sections. You will also provide 5 comprehensive multiple-choice questions and answers (THE "answer" FIELD MUST CORRESSPOND TO THE LETTER OF THE CORRECT OPTION) based on the concepts in the transcription for each topic. The field "course_summary" means the "discipline" it is in. For example, the course "CS50" has "course_subject" be "Computer Science". You must format your output as a JSON file like so:
+const prompt = `You will receive a body of text which is the transcription of an educational video. You will summarize and condense key concepts into different sections based on the course name and the transcription. DO NOT provide more than 10 sections. You will also provide 5 comprehensive multiple-choice questions and answers (THE "answer" FIELD MUST CORRESSPOND TO THE LETTER OF THE CORRECT OPTION) based on the concepts in the transcription for each topic. The field "course_summary" means the "discipline" it is in. For example, the course "CS50" has "course_subject" = "Computer Science". You must format your output as a JSON file like so:
 
 (EXAMPLE)
 {
@@ -112,15 +112,9 @@ router.post('/course', getDataOfTokenIfAvailable, async (req, res) => {
         courseJson = JSON.parse(formatJson);
       }
 
-      // console.log("Generating Course...");
-      // console.log(courseJson.course_name);
-      // console.log(courseJson.course_subject);
-      // console.log(courseJson.course_summary);
-      // console.log(courseJson.sections[0].section);
-      // console.log(courseJson.sections[0].summary);
-      // console.log(courseJson.sections[0].questions);
-      // console.log("End of course.");
+      console.log(courseJson);
 
+      await addCourseOutputToDatabase(courseJson);
       res.status(200).send({
         message: 'Successfully generated the course.',
         u_id: res.locals.u_id,
@@ -129,25 +123,7 @@ router.post('/course', getDataOfTokenIfAvailable, async (req, res) => {
       });
 
       return;
-      // // Upload course details to db
-      // try {
-      //     var courseContent = courseJson.content
-      //     const course: Course = {
-      //         u_id: res.locals.u_id,
-      //         title: title,
-      //         subject: courseContent.course_subject,
-      //         link: link,
-      //         summary: courseContent.course_summary
-      //     }
-      //     const [course_id] = await db('Courses').insert(course);
-      //     res.status(200).send({ course_id: course_id, course: courseContent });
-      // } catch (error) {
-      //     const failure = "Failed to upload new course to database.";
-      //     console.log(failure);
-      //     console.log(error);
-      //     res.status(500).send( { message: failure });
-      //     return;
-      // }
+
     } else {
       const failure = 'Failed to retrieve transcription for the video.';
       console.log(failure);
