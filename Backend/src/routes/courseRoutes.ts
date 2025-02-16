@@ -122,6 +122,9 @@ router.post('/course', getDataOfToken, async (req, res) => {
       courseJson['course_name'] = title;
 
       await addCourseOutputToDatabase(courseJson);
+      
+      console.log("Done!");
+
       res.status(200).send({
         message: 'Successfully generated the course.',
         u_id: res.locals.u_id,
@@ -146,7 +149,6 @@ router.post('/course', getDataOfToken, async (req, res) => {
 router.get('/courses/getIds', async (req, res) => {
   try {
     const data = await db('courses').select('title', 'c_id');
-    console.log(data);
     res.status(200).send(data);
   } catch {
     console.error(Error);
@@ -156,15 +158,23 @@ router.get('/courses/getIds', async (req, res) => {
 
 router.get('/courses/:c_id', async (req, res) => {
   try {
-    const data = await db('Courses as c')
-      .select('c.*', 's.*', 'q.*')
-      .leftJoin('sections as s', 'c.s_id', '=', 's.s_id')
-      .leftJoin('questions as q', 's.s_id', '=', 'q.s_id')
-      .where('c.c_id', Number(req.params.c_id))
-      .first();
+    // const data = await db('Courses as c')
+    //   .select('c.*, s.*, q.*')
+    //   .leftJoin('sections as s', 'c.s_id', '=', 's.s_id')
+    //   .leftJoin('questions as q', 's.s_id', '=', 'q.s_id')
+    //   .where('c.c_id', Number(req.params.c_id))
+    //   .first();
+    const data = await db('courses as c')
+        .select('c.title', 'c.subject')
+        .where('c.c_id', '=', req.params.c_id)
 
+    console.log("among us");
+
+    console.log(req.body.c_id);
+    console.log(req.body.u_id);
     res.status(200).send(data);
   } catch (error) {
+    console.log(error);
     res.status(500).send({ message: 'Internal server error.' });
   }
 });
