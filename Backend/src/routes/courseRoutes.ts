@@ -3,6 +3,7 @@ import { db } from '../database/db';
 import cors from 'cors';
 import OpenAI from "openai";
 import config from "../modules/dots";
+import { getDataOfTokenIfAvailable } from '../middleware/tokenCheckerMiddleware';
 
 // import { db } from '../database/db';
 
@@ -26,10 +27,11 @@ interface DataItem {
 // Interface used for inserting Course into db
 //@ts-ignore
 interface Course {
+    u_id: string;
     title: string;
     subject: string;
     link: string;
-    u_id: string;
+    summary :string;
 }
 
 // ChatGPT prompt
@@ -63,7 +65,7 @@ NOTE THAT each course has multiple topics in "topics".
 `;
 
 // Takes a transcript of a given youtube video and generates a course from it. 
-router.post('/course', async (req, res) => {
+router.post('/course', getDataOfTokenIfAvailable, async (req, res) => {
     try {
         //@ts-ignore
         const title = req.body.title;
@@ -92,22 +94,59 @@ router.post('/course', async (req, res) => {
                         content: transcription,
                     },
                 ],
+                response_format: { "type" : "json_object" },
                 store: false,
             });
-            
-            console.log(completion.choices[0].message);
-            const courseJson = completion.choices[0].message.content;
-            if (courseJson != null) {
-                JSON.parse(courseJson);
+
+            let formatJson = completion.choices[0].message.content;
+            if (formatJson != null) {
+                // Remove the leading and trailing quotes
+                formatJson = formatJson.replace(/^'/, '').replace(/'$/, '');
+
+                // Remove all instances of + and the extra quotes around lines
+                formatJson = formatJson.replace(/'\n' \+ ?/g, '');
+
+                // Convert escaped newlines (\n) to real newlines
+                formatJson = formatJson.replace(/\\n/g, '\n');
             }
-            // Upload course details to db
+            
+            
+            var courseJson;
+            console.log("Parsing Json..");
+            if (formatJson != null) {
+                courseJson = JSON.parse(formatJson);
+            }
+            
+            console.log("Generating Course...");
+            console.log(courseJson.course_name);
+            console.log(courseJson.course_subject);
+            console.log(courseJson.course_summary);
+            console.log(courseJson.sections[0].section);
+            console.log(courseJson.sections[0].summary);
+            console.log(courseJson.sections[0].questions);
+            console.log("End of course.");
+            
+            res.status(200).send( { message: "Success." });
+
+            return;
+            // // Upload course details to db
             // try {
+            //     var courseContent = courseJson.content
             //     const course: Course = {
+            //         u_id: res.locals.u_id,
             //         title: title,
-            //         subject: completion.choices[0].message.
+            //         subject: courseContent.course_subject,
+            //         link: link,
+            //         summary: courseContent.course_summary
             //     }
-            //     const data = await db('Courses')
-            //     .insert()
+            //     const [course_id] = await db('Courses').insert(course);
+            //     res.status(200).send({ course_id: course_id, course: courseContent });
+            // } catch (error) {
+            //     const failure = "Failed to upload new course to database.";
+            //     console.log(failure);
+            //     console.log(error);
+            //     res.status(500).send( { message: failure });
+            //     return;
             // }
             
         } else {
