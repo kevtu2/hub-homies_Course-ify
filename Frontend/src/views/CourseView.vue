@@ -24,30 +24,31 @@
                     <p class="mt-8 mb-8">{{ question.question }}</p>
                     <Form v-slot="$form" class="flex flex-col gap-4">
                       <div class="flex flex-col gap-2">
-                        <div @submit="checkAnswerRoutine(index, qIndex)" name="quiz" class="flex flex-col gap-4">
+                        <div @submit="checkAnswerRoutine(index, qIndex)" class="flex flex-col gap-4">
                           <div class="flex items-center gap-2">
-                            <RadioButton inputId="a" v-model="selectedAnswer" value="1" :invalid="answerCorrectness"/>
+                            <RadioButton v-model="selectedAnswer" value="1" :invalid="!answerCorrectness"/>
                             <label for="a">{{ question.a }}</label>
                           </div>
                           <div class="flex items-center gap-2">
-                            <RadioButton inputId="b" v-model="selectedAnswer" value="2" :invalid="!answerCorrectness"/>
+                            <RadioButton v-model="selectedAnswer" value="2" :invalid="!answerCorrectness"/>
                             <label for="b">{{ question.b }}</label>
                           </div>
                           <div class="flex items-center gap-2">
-                            <RadioButton inputId="c" v-model="selectedAnswer" value="3" :invalid="!answerCorrectness"/>
+                            <RadioButton v-model="selectedAnswer" value="3" :invalid="!answerCorrectness"/>
                             <label for="c">{{ question.c }}</label>
                           </div>
                           <div class="flex items-center gap-2">
-                            <RadioButton inputId="d" v-model="selectedAnswer" value="4" :invalid="!answerCorrectness"/>
+                            <RadioButton v-model="selectedAnswer" value="4" :invalid="!answerCorrectness"/>
                             <label for="d">{{ question.d }}</label>
                           </div>
                         </div>
                       </div>
                       <Button v-if="!visibleAnswers[index][qIndex]" class="w-40" type="submit" severity="secondary" label="Submit" @click="checkAnswerRoutine(index,qIndex)" />
-                      <Button v-if="visibleAnswers[index][qIndex]" class="w-40" type="button" severity="secondary" label="Hide the answer" @click="clearAnswerRoutine(index,qIndex)" />
+                      <Button v-if="visibleAnswers[index][qIndex]" class="w-40" type="button" severity="secondary" label="Clear the answer" @click="clearAnswerRoutine(index,qIndex)" />
                     </Form>
-                    <p v-if="visibleAnswers[index][qIndex]" class="text-xl mt-5 mb-5">Reference Answer</p>
-                    <p v-if="visibleAnswers[index][qIndex]">{{ mapAnswer[question.answer] }}</p>
+                    <p v-if="visibleAnswers[index][qIndex]&&!answerCorrectness" class="text-xl mt-5 mb-5">Incorret.<br>Reference Answer:</p>
+                    <p v-if="visibleAnswers[index][qIndex]&&!answerCorrectness">{{ mapAnswer[question.answer] }}</p>
+                    <p v-if="visibleAnswers[index][qIndex]&&answerCorrectness" class="text-xl mt-5 mb-5">You are Correct!</p>
                   </AccordionContent>
                 </AccordionPanel>
               </Accordion>
@@ -161,7 +162,7 @@ const checkAnswerRoutine = (index: number, qIndex: number) => {
         } else {
           answerCorrectness.value = false;
         }
-        console.log("Answer correctness determination: ",answerCorrectness.value,"Real answer: ", realAnswer, ", selected answer: ",selectedAnswer);
+        console.log("Answer correctness determination: ",answerCorrectness.value,"Real answer: ", realAnswer, ", selected answer: ",selectedAnswer.value);
       } else {
         alert('Please select an option!');
         console.log("The selectedAnswer variable answer: ",selectedAnswer.value)
@@ -170,6 +171,8 @@ const checkAnswerRoutine = (index: number, qIndex: number) => {
     };
 
 const clearAnswerRoutine = (index: number, qIndex: number) => {
+  answerCorrectness.value = true;
+  selectedAnswer.value = '';
   toggleVisibility(index,qIndex);
 }
 
