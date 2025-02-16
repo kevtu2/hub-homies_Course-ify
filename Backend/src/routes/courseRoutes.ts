@@ -81,6 +81,7 @@ router.post('/course', getDataOfTokenIfAvailable, async (req, res) => {
 
     // Query ChatGPT 4o-mini
     if (transcription != null) {
+        console.log("Asking gpt-4o-mini..");
       const completion = await openai.chat.completions.create({
         model: 'gpt-4o-mini',
         messages: [
@@ -94,8 +95,10 @@ router.post('/course', getDataOfTokenIfAvailable, async (req, res) => {
         store: false,
       });
 
+      
       let formatJson = completion.choices[0].message.content;
       if (formatJson != null) {
+        console.log("Formatting gpt's json..");
         // Remove the leading and trailing quotes
         formatJson = formatJson.replace(/^'/, '').replace(/'$/, '');
 
@@ -114,6 +117,7 @@ router.post('/course', getDataOfTokenIfAvailable, async (req, res) => {
 
       console.log(courseJson);
 
+      console.log("Adding course to db..");
       await addCourseOutputToDatabase(courseJson);
       res.status(200).send({
         message: 'Successfully generated the course.',
