@@ -2,7 +2,7 @@
 
 <template>
   <main>
-    <div>I am the about page.</div>
+    <div>Course</div>
   </main>
 </template>
 
