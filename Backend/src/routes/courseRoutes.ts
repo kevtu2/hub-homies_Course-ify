@@ -122,6 +122,11 @@ router.post('/course', async (req, res) => {
     }
 });
 
+router.get('/getCourses', async (req, res) => {
+    //const token = req.headers['authorization'];
+    
+});
+
 router.get('/courses/:id', async (req, res) => {
     try {
         const data = await db('Courses')

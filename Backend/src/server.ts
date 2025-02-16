@@ -1,7 +1,7 @@
 import express from 'express';
 import bookRoutes from './routes/bookRoutes';
 
-//import authRoutes from './routes/authRoutes';
+import authRoutes from './routes/authRoutes';
 import courseRoutes from './routes/courseRoutes';
 
 import cors from 'cors';
@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
 
 app.use('/api', bookRoutes);
 
-//app.use('/api', authRoutes);
+app.use('/api', authRoutes);
 
 app.use('/api', courseRoutes);
 

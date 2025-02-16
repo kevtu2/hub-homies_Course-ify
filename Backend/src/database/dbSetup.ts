@@ -3,6 +3,105 @@ import { db } from './db';
 
 export async function setupDatabase() {
   try {
+    if (await db.schema.hasTable('users') == false) {
+      await db.schema.createTable('users', (table: Knex.TableBuilder) => {
+        table.increments('u_id').primary();
+        table.string('email').notNullable();
+        table.string('pwd').notNullable();
+        table.string('name').notNullable();
+      });
+    }
+    
+    if (await db.schema.hasTable('courses') == false) {
+      await db.schema.createTable('courses', (table: Knex.TableBuilder) => {
+        table.increments('c_id').primary();
+        table.integer('u_id').unsigned().references('u_id').inTable('users').notNullable();
+        table.string('title').notNullable();
+        table.string('subject').notNullable();
+        table.string('link').notNullable();
+        table.string('added_date').notNullable();
+      });
+    }
+
+    if(await db.schema.hasTable('sections') == false) {
+      await db.schema.createTable('sections', (table: Knex.TableBuilder) => {
+        table.increments('s_id').primary();
+        table.integer('c_id').unsigned().references('c_id').inTable('courses').notNullable();
+        table.integer('position').unsigned().notNullable().unique();
+        table.string('s_name').notNullable();
+        table.string('s_text').notNullable();
+      });
+    }
+
+    if(await db.schema.hasTable('section_finished') == false) {
+      await db.schema.createTable('section_finished', (table: Knex.TableBuilder) => {
+        table.primary(['u_id', 's_id']);
+        table.integer('u_id').unsigned().references('u_id').inTable('users').notNullable();
+        table.integer('s_id').unsigned().references('s_id').inTable('sections').notNullable();
+        table.timestamp('date_finished').defaultTo(db.fn.now());
+      });
+    }
+
+    if(await db.schema.hasTable('questions') == false) {
+      await db.schema.createTable('questions', (table: Knex.TableBuilder) => {
+        table.increments('q_id').primary();
+        table.integer('s_id').unsigned().references('s_id').inTable('sections').notNullable();
+        table.integer('position').unsigned().notNullable().unique();
+        table.string('q_text').notNullable();
+        table.integer('q_ans').notNullable();
+
+        table.string('a1_text').notNullable();
+        table.string('a2_text').notNullable();
+        table.string('a3_text').notNullable();
+        table.string('a4_text').notNullable();
+      });
+    }
+
+    if(await db.schema.hasTable('user_answered') == false) {
+      await db.schema.createTable('user_answered', (table: Knex.TableBuilder) => {
+        table.primary(['u_id', 'q_id']);
+        table.integer('u_id').unsigned().references('u_id').inTable('users').notNullable();
+        table.integer('q_id').unsigned().references('q_id').inTable('questions').notNullable();
+        table.integer('a_picked').unsigned().notNullable();
+        table.timestamp('date_answered').defaultTo(db.fn.now());
+      });
+    }
+
+    if(await db.schema.hasTable('follows') == false) {
+      await db.schema.createTable('follows', (table: Knex.TableBuilder) => {
+        table.primary(['flwer', 'flwee']);
+        table.integer('flwer').unsigned().references('u_id').inTable('users').notNullable();
+        table.integer('flwee').unsigned().references('u_id').inTable('users').notNullable();
+        table.timestamp('date_followed').defaultTo(db.fn.now());
+      });
+    }
+
+    if(await db.schema.hasTable('achievements') == false) {
+      await db.schema.createTable('achievements', (table: Knex.TableBuilder) => {
+        table.increments('ach_id').primary();
+        table.string('ach_name').notNullable();
+        table.string('ach_text').notNullable();
+      });
+    }
+
+    if(await db.schema.hasTable('has_achievement') == false) {
+      await db.schema.createTable('has_achievement', (table: Knex.TableBuilder) => {
+        table.primary(['u_id', 'ach_id']);
+        table.integer('u_id').unsigned().references('u_id').inTable('users').notNullable();
+        table.integer('ach_id').unsigned().references('ach_id').inTable('achievements').notNullable();
+        table.timestamp('date_achieved').defaultTo(db.fn.now());
+      });
+    }
+
+    console.log('Database setup completed successfully.');
+  } catch (error) {
+    console.log('Failed to set up the database:', error);
+  }
+}
+
+/*
+export async function setupDatabase() {
+  try {
     //
     // 1) DROP TABLES in reverse dependency order
     //
@@ -160,3 +259,4 @@ export async function setupDatabase() {
     console.error('Failed to set up the database:', error);
   }
 }
+*/
