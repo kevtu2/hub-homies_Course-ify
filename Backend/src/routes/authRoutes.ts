@@ -5,25 +5,32 @@ import jwt, { Secret } from 'jsonwebtoken';
 import { getDataOfToken } from '../middleware/tokenCheckerMiddleware';
 
 const router = Router();
-const JWT_SECRET = config.JWT_SECRET
+const JWT_SECRET = config.JWT_SECRET;
 
 router.post('/auth/login', async (req, res) => {
     try {
         const user = await db('users')
             .select('u_id', 'name')
             .where('email', req.body.email)
-            .where('pwd', req.body.pwd).first();
+            .where('pwd', req.body.pwd)
+            .first();
+
+        // Fix: Handle case where user is not found.
+        if (!user) {
+            return res.status(400).send({ message: 'Invalid credentials.' });
+        }
+
         const token = jwt.sign({ u_id: user.u_id }, JWT_SECRET as Secret, { expiresIn: '7d' });
 
         const outputData = {
             token: token,
             name: user.name,
             u_id: user.u_id
-        }
+        };
 
-        res.status(200).send(outputData)
+        res.status(200).send(outputData);
     } catch (error) {
-        res.status(500).send({ message: 'Internal server error.' })
+        res.status(500).send({ message: 'Internal server error.' });
     }
 });
 
@@ -48,10 +55,9 @@ router.post('/auth/tokenLogin', getDataOfToken, async (req, res) => {
 
         res.status(200).send(outputData);
     } catch (error) {
-        console.log(error)
-        res.status(500).send({ message: 'Internal server error.' })
+        res.status(500).send({ message: 'Internal server error.' });
     }
-})
+});
 
 router.post('/auth/createAccount', async (req, res) => {
     try {
@@ -94,8 +100,9 @@ router.post('/auth/createAccount', async (req, res) => {
 
         res.status(200).send(outputData);
     } catch (error) {
-        res.status(500).send({ message: 'Internal server error.' })
+        console.log(error);
+        res.status(500).send({ message: 'Internal server error.' });
     }
-})
+});
 
 export default router;
