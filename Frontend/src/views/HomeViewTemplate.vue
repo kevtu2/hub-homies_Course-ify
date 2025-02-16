@@ -1,6 +1,4 @@
-/*
-This is the original template for home view.
-This file should not be used in the formal release.
+/* This is the original template for home view. This file should not be used in the formal release.
 */
 
 <script setup lang="ts">

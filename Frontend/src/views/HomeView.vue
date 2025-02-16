@@ -17,45 +17,54 @@ const submitTitle = async () => {
     errorToast('Warning', 'You must provide a title!');
   } else {
     try {
-    await axios.post('http://localhost:3000/api/course',{
-      link: link.value,
-      title: title.value
-        });
-      } catch(error) {
-    console.error("Error submitting link:",error);
+      await axios.post('http://localhost:3000/api/course', {
+        link: link.value,
+        title: title.value,
+      });
+    } catch (error) {
+      console.error('Error submitting link:', error);
     }
   }
-}
+};
 
 const submitLink = async () => {
   if (!link.value.trim()) {
     errorToast('Warning', 'You must provide a link!');
   } else {
-    visible.value=true;
+    visible.value = true;
   }
-}
-
+};
 </script>
 
 <template>
-<div class="flex flex-col items-center justify-center v-screen h-[80%] gap-5">
-  <p class="text-5xl">COURSE-IFY</p>
-  <p class="text-2xl mb-20">We make YouTube videos into an interactive course</p>
-  <div class="flex items-center justify-center w-[80%] gap-4">
-    <InputText v-model="link" placeholder="Put your YouTube video link here" class="p-inputtext-lg w-[80%]" size="large" />
-    <Button label='Submit' @click="submitLink"/>
+  <div class="flex flex-col items-center justify-center v-screen h-[80%] gap-5">
+    <p class="text-5xl">COURSE-IFY</p>
+    <p class="text-2xl mb-20">We make YouTube videos into an interactive course</p>
+    <div class="flex items-center justify-center w-[80%] gap-4">
+      <InputText
+        v-model="link"
+        placeholder="Put your YouTube video link here"
+        class="p-inputtext-lg w-[80%]"
+        size="large"
+      />
+      <Button label="Submit" @click="submitLink" />
+    </div>
   </div>
-</div>
 
-<Dialog v-model:visible="visible" modal header="Edit the Course Title" :style="{ width: '25rem' }">
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="Edit the Course Title"
+    :style="{ width: '25rem' }"
+  >
     <div class="flex items-center gap-4 mb-4">
-        <label for="course title" class="font-semibold w-24">Title</label>
-        <InputText v-model="title" id="course title" class="flex-auto" autocomplete="off" />
+      <label for="course title" class="font-semibold w-24">Title</label>
+      <InputText v-model="title" id="course title" class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex justify-end gap-2">
-        <Button type="button" label="Save" @click="submitTitle"></Button>
+      <Button type="button" label="Save" @click="submitTitle"></Button>
     </div>
-</Dialog>
+  </Dialog>
 </template>
 
 <style scoped></style>

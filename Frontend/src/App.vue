@@ -25,7 +25,7 @@ interface Course {
   command: () => void;
 }
 
-const courses = ref<Course[]>([])
+const courses = ref<Course[]>([]);
 
 const items = computed(() => {
   return [
@@ -34,31 +34,31 @@ const items = computed(() => {
       icon: 'pi pi-home',
       command: () => {
         router.push('/');
-      }
+      },
     },
     {
       label: 'Dashboard',
       icon: 'pi pi-chart-bar',
       command: () => {
         router.push('/dashboard');
-      }
+      },
     },
     {
       label: 'Courses',
       icon: 'pi pi-book',
       badge: Object.keys(courses.value).length,
-      items: courses.value
-    }
-  ]
-})
+      items: courses.value,
+    },
+  ];
+});
 
-function addCourseToMenu(courseName : string, courseRoute : string) {
+function addCourseToMenu(courseName: string, courseRoute: string) {
   courses.value.push({
     label: courseName,
     route: courseRoute,
     command: () => {
       router.push(courseRoute);
-    }
+    },
   });
 }
 
@@ -81,8 +81,8 @@ async function tryLogin() {
       email: loginEmailInput.value,
       pwd: loginPasswordInput.value,
     });
-    
-    if(response.data != null) {
+
+    if (response.data != null) {
       Cookies.set('token', response.data.token);
       authStore.login(response.data.name, response.data.u_id);
       loginDialogVisible.value = false;
@@ -97,17 +97,23 @@ async function tryLogin() {
 }
 
 async function tryStartupLogin() {
-  if(Cookies.get('token') == null) { return; }
+  if (Cookies.get('token') == null) {
+    return;
+  }
 
   try {
-    const response = await axios.post('http://localhost:3000/api/auth/tokenLogin', {}, {
-      headers: {
-        'authorization': Cookies.get('token')
-      }
-    });
+    const response = await axios.post(
+      'http://localhost:3000/api/auth/tokenLogin',
+      {},
+      {
+        headers: {
+          authorization: Cookies.get('token'),
+        },
+      },
+    );
 
-    if(response.data != null) {
-      Cookies.set('token', response.data.token);  
+    if (response.data != null) {
+      Cookies.set('token', response.data.token);
       authStore.login(response.data.name, response.data.u_id);
     }
   } catch (error) {
@@ -131,8 +137,8 @@ async function tryCreateAccount() {
       email: createEmailInput.value,
       name: createUsernameInput.value,
       pwd: createPasswordInput.value,
-    })
-    if(response.data != null) {
+    });
+    if (response.data != null) {
       Cookies.set('token', response.data.token);
       authStore.login(response.data.name, response.data.u_id);
       createAccountDialogVisible.value = false;
@@ -142,7 +148,7 @@ async function tryCreateAccount() {
     }
   } catch (error) {
     errorToast('Error', 'Account creation unsuccessful');
-    console.error(error); 
+    console.error(error);
   }
 }
 
@@ -155,12 +161,22 @@ const u_id = computed(() => authStore.u_id);
   <main class="flex flex-col h-screen">
     <Menubar :model="items">
       <template #item="{ item, props, hasSubmenu, root }">
-          <a class="flex items-center" v-bind="props.action">
-              <span>{{ item.label }}</span>
-              <Badge v-if="item.badge" :value="item.badge" />
-              <span v-if="item.shortcut" class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">{{ item.shortcut }}</span>
-              <i v-if="hasSubmenu" :class="['pi pi-angle-down ml-auto', { 'pi-angle-down': root, 'pi-angle-right': !root }]"></i>
-          </a>
+        <a class="flex items-center" v-bind="props.action">
+          <span>{{ item.label }}</span>
+          <Badge v-if="item.badge" :value="item.badge" />
+          <span
+            v-if="item.shortcut"
+            class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1"
+            >{{ item.shortcut }}</span
+          >
+          <i
+            v-if="hasSubmenu"
+            :class="[
+              'pi pi-angle-down ml-auto',
+              { 'pi-angle-down': root, 'pi-angle-right': !root },
+            ]"
+          ></i>
+        </a>
       </template>
       <template #end>
         <div v-if="isLoggedIn">
@@ -168,8 +184,18 @@ const u_id = computed(() => authStore.u_id);
           <Button class="ml-2" @click="tryLogout" severity="secondary" icon="pi pi-sign-out" />
         </div>
         <div class="flex gap-2">
-          <Button v-if="!isLoggedIn" @click="createAccountDialogVisible = true" severity="secondary" icon="pi pi-user-plus" />
-          <Button v-if="!isLoggedIn" @click="loginDialogVisible = true" severity="secondary" icon="pi pi-sign-in" />
+          <Button
+            v-if="!isLoggedIn"
+            @click="createAccountDialogVisible = true"
+            severity="secondary"
+            icon="pi pi-user-plus"
+          />
+          <Button
+            v-if="!isLoggedIn"
+            @click="loginDialogVisible = true"
+            severity="secondary"
+            icon="pi pi-sign-in"
+          />
         </div>
       </template>
     </Menubar>
@@ -179,17 +205,12 @@ const u_id = computed(() => authStore.u_id);
     <Dialog v-model:visible="loginDialogVisible" :dismissableMask="true" modal header="Login">
       <Form class="flex flex-col">
         <FloatLabel class="mt-5">
-          <InputText 
-            v-model="loginEmailInput"
-            type="email"
-            autocomplete="email"
-            id="email"
-          />
+          <InputText v-model="loginEmailInput" type="email" autocomplete="email" id="email" />
           <label for="email">Email</label>
         </FloatLabel>
 
         <FloatLabel class="mt-7">
-          <InputText 
+          <InputText
             v-model="loginPasswordInput"
             type="password"
             autocomplete="current-password"
@@ -204,16 +225,15 @@ const u_id = computed(() => authStore.u_id);
       </template>
     </Dialog>
 
-    <Dialog v-model:visible="createAccountDialogVisible" :dismissableMask="true" modal header="Create Account">
-      
+    <Dialog
+      v-model:visible="createAccountDialogVisible"
+      :dismissableMask="true"
+      modal
+      header="Create Account"
+    >
       <Form class="flex flex-col">
         <FloatLabel class="mt-5">
-          <InputText
-            v-model="createEmailInput"
-            type="email"
-            autocomplete="email"
-            id="email"
-          />
+          <InputText v-model="createEmailInput" type="email" autocomplete="email" id="email" />
           <label for="email">Email</label>
         </FloatLabel>
         <FloatLabel class="mt-7">
