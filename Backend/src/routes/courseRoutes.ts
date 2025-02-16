@@ -117,16 +117,21 @@ router.post('/course', getDataOfTokenIfAvailable, async (req, res) => {
                 courseJson = JSON.parse(formatJson);
             }
             
-            console.log("Generating Course...");
-            console.log(courseJson.course_name);
-            console.log(courseJson.course_subject);
-            console.log(courseJson.course_summary);
-            console.log(courseJson.sections[0].section);
-            console.log(courseJson.sections[0].summary);
-            console.log(courseJson.sections[0].questions);
-            console.log("End of course.");
+            // console.log("Generating Course...");
+            // console.log(courseJson.course_name);
+            // console.log(courseJson.course_subject);
+            // console.log(courseJson.course_summary);
+            // console.log(courseJson.sections[0].section);
+            // console.log(courseJson.sections[0].summary);
+            // console.log(courseJson.sections[0].questions);
+            // console.log("End of course.");
             
-            res.status(200).send( { message: "Success." });
+            res.status(200).send({ 
+                    message: "Successfully generated the course.", 
+                    u_id: res.locals.u_id,
+                    link: link,
+                    course: courseJson
+                 });
 
             return;
             // // Upload course details to db
