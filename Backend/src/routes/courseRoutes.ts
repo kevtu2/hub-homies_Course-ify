@@ -119,6 +119,7 @@ router.post('/course', getDataOfToken, async (req, res) => {
 
       courseJson['u_id'] = 1;
       courseJson['link'] = link;
+      courseJson['course_name'] = title;
 
       await addCourseOutputToDatabase(courseJson);
       res.status(200).send({
