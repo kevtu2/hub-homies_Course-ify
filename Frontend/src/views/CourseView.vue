@@ -26,19 +26,19 @@
                       <div class="flex flex-col gap-2">
                         <div @submit="checkAnswerRoutine(index, qIndex)" class="flex flex-col gap-4">
                           <div class="flex items-center gap-2">
-                            <RadioButton v-model="selectedAnswer" value="1" :invalid="!answerCorrectness"/>
+                            <RadioButton v-model="selectedAnswer[index][qIndex]" value="1" :invalid="!answerCorrectness[index][qIndex]"/>
                             <label for="a">{{ question.a }}</label>
                           </div>
                           <div class="flex items-center gap-2">
-                            <RadioButton v-model="selectedAnswer" value="2" :invalid="!answerCorrectness"/>
+                            <RadioButton v-model="selectedAnswer[index][qIndex]" value="2" :invalid="!answerCorrectness[index][qIndex]"/>
                             <label for="b">{{ question.b }}</label>
                           </div>
                           <div class="flex items-center gap-2">
-                            <RadioButton v-model="selectedAnswer" value="3" :invalid="!answerCorrectness"/>
+                            <RadioButton v-model="selectedAnswer[index][qIndex]" value="3" :invalid="!answerCorrectness[index][qIndex]"/>
                             <label for="c">{{ question.c }}</label>
                           </div>
                           <div class="flex items-center gap-2">
-                            <RadioButton v-model="selectedAnswer" value="4" :invalid="!answerCorrectness"/>
+                            <RadioButton v-model="selectedAnswer[index][qIndex]" value="4" :invalid="!answerCorrectness[index][qIndex]"/>
                             <label for="d">{{ question.d }}</label>
                           </div>
                         </div>
@@ -46,9 +46,9 @@
                       <Button v-if="!visibleAnswers[index][qIndex]" class="w-40" type="submit" severity="secondary" label="Submit" @click="checkAnswerRoutine(index,qIndex)" />
                       <Button v-if="visibleAnswers[index][qIndex]" class="w-40" type="button" severity="secondary" label="Clear the answer" @click="clearAnswerRoutine(index,qIndex)" />
                     </Form>
-                    <p v-if="visibleAnswers[index][qIndex]&&!answerCorrectness" class="text-xl mt-5 mb-5">Incorret.<br>Reference Answer:</p>
-                    <p v-if="visibleAnswers[index][qIndex]&&!answerCorrectness">{{ mapAnswer[question.answer] }}</p>
-                    <p v-if="visibleAnswers[index][qIndex]&&answerCorrectness" class="text-xl mt-5 mb-5">You are Correct!</p>
+                    <p v-if="visibleAnswers[index][qIndex]&&!answerCorrectness[index][qIndex]" class="text-xl mt-5 mb-5">Incorret.<br>Reference Answer:</p>
+                    <p v-if="visibleAnswers[index][qIndex]&&!answerCorrectness[index][qIndex]">{{ mapAnswer[question.answer] }}</p>
+                    <p v-if="visibleAnswers[index][qIndex]&&answerCorrectness[index][qIndex]" class="text-xl mt-5 mb-5">You are Correct!</p>
                   </AccordionContent>
                 </AccordionPanel>
               </Accordion>
@@ -146,33 +146,34 @@ const mapAnswer: {
 }
 
 const visibleAnswers = ref(courseData.value.sections.map(section => section.questions.map(() => false)));
-const answerCorrectness = ref(true);
-const selectedAnswer = ref('');
+const answerCorrectness = ref(courseData.value.sections.map(section => section.questions.map(() => true)));
+const selectedAnswer = ref(courseData.value.sections.map(section => section.questions.map(() => '')));
 
 const checkAnswerRoutine = (index: number, qIndex: number) => {
       const realAnswer = courseData.value.sections[index].questions[qIndex].answer;
+      const propsedAnswer = selectedAnswer.value[index][qIndex];
       if (!Object.keys(mapAnswer).includes(realAnswer)) {
         alert('BUG: There is no valid answer for this question');
         console.log("proposed invalid answer: ",realAnswer)
         return;
       }
       if (selectedAnswer.value !== null) {
-        if (selectedAnswer.value == realAnswer) {
-          answerCorrectness.value = true;
+        if (propsedAnswer == realAnswer) {
+          answerCorrectness.value[index][qIndex] = true;
         } else {
-          answerCorrectness.value = false;
+          answerCorrectness.value[index][qIndex] = false;
         }
-        console.log("Answer correctness determination: ",answerCorrectness.value,"Real answer: ", realAnswer, ", selected answer: ",selectedAnswer.value);
+        console.log("Answer correctness determination: ",answerCorrectness.value[index][qIndex],"Real answer: ", realAnswer, ", selected answer: ",selectedAnswer.value[index][qIndex]);
       } else {
         alert('Please select an option!');
-        console.log("The selectedAnswer variable answer: ",selectedAnswer.value)
+        console.log("The selectedAnswer variable answer: ",selectedAnswer.value[index][qIndex])
       }
       toggleVisibility(index,qIndex);
     };
 
 const clearAnswerRoutine = (index: number, qIndex: number) => {
-  answerCorrectness.value = true;
-  selectedAnswer.value = '';
+  answerCorrectness.value[index][qIndex] = true;
+  selectedAnswer.value[index][qIndex] = '';
   toggleVisibility(index,qIndex);
 }
 
