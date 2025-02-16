@@ -38,12 +38,10 @@ router.post('/tokenLogin', async (req, res) => {
 
 router.post('/createAccount', async (req, res) => {
     try {
-        //Create an account with input data
 
         const outputData = {}
 
         const token = jwt.sign({ u_id: 1 }, JWT_SECRET as Secret, { expiresIn: '7d' });
-        //Get the username, u_id, for the id corresponding to the new account
 
         res.status(200).send(outputData)
     } catch (error) {
