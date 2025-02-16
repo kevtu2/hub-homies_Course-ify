@@ -58,12 +58,10 @@ router.post('/course', async (req, res) => {
 
         // Obtain transcription from youtube video
         const result = await Transcriptor.getTranscript('https://www.youtube.com/watch?v=8geaZ0katu0')
-        // @ts-ignore
-        console.log(result.data);
-        // @ts-ignore
-        if (result != null && Array.isArray(result.data)) {
-            // @ts-ignore
-            transcription = (result.data.text as DataItem[]).map((item) => item.text).join(' ');
+
+        if (result != null && !Array.isArray(result) && result.data) {
+            console.log(result.data);
+            transcription = (result.data as DataItem[]).map((item) => item.text).join(' ');
         } else {
             const failure = "Failed to retrieve transcription for the video."
             console.log(failure);
