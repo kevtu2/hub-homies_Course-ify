@@ -23,12 +23,22 @@ interface DataItem {
     lang: string;
 }
 
+// Interface used for inserting Course into db
+//@ts-ignore
+interface Course {
+    title: string;
+    subject: string;
+    link: string;
+    u_id: string;
+}
+
 // ChatGPT prompt
-const prompt = `You will receive a body of text which is the transcription of an educational video. You will summarize and condense key concepts into different sections based on the course name and the transcription. DO NOT provide more than 10 sections. You will also provide 5 comprehensive multiple-choice questions and answers (CORRESPONDING TO THE LETTER OF CORRECT ANSWER) based on the concepts in the transcription for each topic. You must format your output as a JSON file like so:
+const prompt = `You will receive a body of text which is the transcription of an educational video. You will summarize and condense key concepts into different sections based on the course name and the transcription. DO NOT provide more than 10 sections. You will also provide 5 comprehensive multiple-choice questions and answers (THE "answer" FIELD MUST CORRESSPOND TO THE LETTER OF THE CORRECT OPTION) based on the concepts in the transcription for each topic. The field "course_summary" means the "discipline" it is in. For example, the course "CS50" has "course_subject" be "Computer Science". You must format your output as a JSON file like so:
 
 (EXAMPLE)
 {
     "course_name": "COURSE_NAME",
+    "course_subject": "COURSE_SUBJECT",
     "course_summary": "COURSE_SUMMARY",
     "sections": [
         {
@@ -55,6 +65,7 @@ NOTE THAT each course has multiple topics in "topics".
 // Takes a transcript of a given youtube video and generates a course from it. 
 router.post('/course', async (req, res) => {
     try {
+        //@ts-ignore
         const title = req.body.title;
         const link = req.body.link; 
         var transcription;
@@ -85,11 +96,20 @@ router.post('/course', async (req, res) => {
             });
             
             console.log(completion.choices[0].message);
-            // Send the course details
-            res.status(200).send({ 
-                title: title,
-                course: completion.choices[0].message
-            });
+            const courseJson = completion.choices[0].message.content;
+            if (courseJson != null) {
+                JSON.parse(courseJson);
+            }
+            // Upload course details to db
+            // try {
+            //     const course: Course = {
+            //         title: title,
+            //         subject: completion.choices[0].message.
+            //     }
+            //     const data = await db('Courses')
+            //     .insert()
+            // }
+            
         } else {
             const failure = "Failed to retrieve transcription for the video."
             console.log(failure);
