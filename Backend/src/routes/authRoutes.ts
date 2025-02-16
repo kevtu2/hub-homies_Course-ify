@@ -6,14 +6,19 @@ import jwt, { Secret } from 'jsonwebtoken';
 const router = Router();
 const JWT_SECRET = config.JWT_SECRET
 
-router.post('/login', async (req, res) => {
+router.post('/auth/login', async (req, res) => {
     try {
-        //Check if the email, password combination is valid
-        
-        //Get the username, u_id for the id corresponding to the id
-        const token = jwt.sign({ u_id: 1 }, JWT_SECRET as Secret, { expiresIn: '7d' });
+        const user = await db('Users')
+            .select('u_id', 'name')
+            .where('email', req.body.email)
+            .where('pwd', req.body.pwd).first();
+        const token = jwt.sign({ u_id: user.u_id }, JWT_SECRET as Secret, { expiresIn: '7d' });
 
-        const outputData = {}
+        const outputData = {
+            token: token,
+            name: user.name,
+            u_id: user.u_id
+        }
 
         res.status(200).send(outputData)
     } catch (error) {
@@ -21,28 +26,67 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.post('/tokenLogin', async (req, res) => {
+router.post('/auth/tokenLogin', async (req, res) => {
     try {
-        const tokenData = jwt.verify(req.body.token, JWT_SECRET as Secret);
-
-        //Get the username, u_id for the id corresponding to tokenData.u_id
+        const tokenData = jwt.verify(req.body.token, JWT_SECRET as Secret) as { u_id: number };
         
-        const outputData = {}
+        const user = await db('Users')
+            .select('u_id', 'name')
+            .where('u_id', tokenData.u_id)
+            .first();
 
-        res.status(200).send(outputData)
+        if (!user) {
+            return res.status(404).send({ message: 'User not found.' });
+        }
+
+        const newToken = jwt.sign({ u_id: user.u_id }, JWT_SECRET as Secret, { expiresIn: '7d' });
+
+        const outputData = {
+            token: newToken,
+            name: user.name,
+            u_id: user.u_id
+        };
+
+        res.status(200).send(outputData);
     } catch (error) {
         res.status(500).send({ message: 'Internal server error.' })
     }
 })
 
-router.post('/createAccount', async (req, res) => {
+router.post('/auth/createAccount', async (req, res) => {
     try {
+        console.log(req.body)
+        const { email, username , pwd } = req.body;
 
-        const outputData = {}
+        if (!username || !email || !pwd) {
+            return res.status(400).send({ message: 'Missing required fields.' });
+        }
 
-        const token = jwt.sign({ u_id: 1 }, JWT_SECRET as Secret, { expiresIn: '7d' });
+        const existingUser = await db('Users').where('email', email).first();
+        if (existingUser) {
+            return res.status(400).send({ message: 'Email already exists.' });
+        }
 
-        res.status(200).send(outputData)
+        await db('Users').insert({ username, email, pwd });
+
+        const user = await db('Users')
+            .select('u_id', 'name')
+            .where('email', email)
+            .first();
+
+        if (!user) {
+            return res.status(500).send({ message: 'Failed to create user.' });
+        }
+
+        const token = jwt.sign({ u_id: user.u_id }, JWT_SECRET as Secret, { expiresIn: '7d' });
+
+        const outputData = {
+            token: token,
+            name: user.name,
+            u_id: user.u_id
+        };
+
+        res.status(200).send(outputData);
     } catch (error) {
         res.status(500).send({ message: 'Internal server error.' })
     }
