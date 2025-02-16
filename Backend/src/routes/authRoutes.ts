@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { db } from '../database/db';
 import config from '../modules/dots';
 import jwt, { Secret } from 'jsonwebtoken';
+import { getDataOfToken } from '../middleware/tokenCheckerMiddleware';
 
 const router = Router();
 const JWT_SECRET = config.JWT_SECRET
@@ -26,13 +27,11 @@ router.post('/auth/login', async (req, res) => {
     }
 });
 
-router.post('/auth/tokenLogin', async (req, res) => {
-    try {
-        const tokenData = jwt.verify(req.body.token, JWT_SECRET as Secret) as { u_id: number };
-        
+router.post('/auth/tokenLogin', getDataOfToken, async (req, res) => {
+    try {        
         const user = await db('Users')
             .select('u_id', 'name')
-            .where('u_id', tokenData.u_id)
+            .where('u_id', res.locals.u_id)
             .first();
 
         if (!user) {
@@ -94,7 +93,6 @@ router.post('/auth/createAccount', async (req, res) => {
 
         res.status(200).send(outputData);
     } catch (error) {
-        console.log(error);
         res.status(500).send({ message: 'Internal server error.' })
     }
 })

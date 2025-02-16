@@ -82,8 +82,10 @@ async function tryStartupLogin() {
   if(Cookies.get('token') == null) { return; }
 
   try {
-    const response = await axios.post('http://localhost:3000/api/auth/tokenLogin', {
-      token: Cookies.get('token')
+    const response = await axios.post('http://localhost:3000/api/auth/tokenLogin', {}, {
+      headers: {
+        'authorization': Cookies.get('token')
+      }
     });
 
     if(response.data != null) {
