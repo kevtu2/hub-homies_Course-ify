@@ -5,6 +5,8 @@ import Badge from 'primevue/badge';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import { Form } from '@primevue/forms';
+
 import { useAuthStore } from './stores/auth';
 
 import router from '@/router';
@@ -139,10 +141,21 @@ const u_id = computed(() => authStore.u_id);
     <RouterView />
 
     <Dialog v-model:visible="loginDialogVisible" :dismissableMask="true" modal header="Login">
-      <div class="flex flex-col gap-2">
-        <InputText v-model="loginEmailInput" placeholder="Email" />
-        <InputText v-model="loginPasswordInput" placeholder="Password" />
-      </div>
+      <Form class="flex flex-col gap-2">
+        <InputText 
+          v-model="loginEmailInput"
+          placeholder="Email"
+          type="email"
+          autocomplete="email"
+        />
+
+        <InputText 
+          v-model="loginPasswordInput"
+          placeholder="Password" 
+          type="password"
+          autocomplete="current-password"
+        />
+      </Form>
 
       <template #footer>
         <Button @click="tryLogin" severity="secondary" label="Login" />
@@ -150,11 +163,27 @@ const u_id = computed(() => authStore.u_id);
     </Dialog>
 
     <Dialog v-model:visible="createAccountDialogVisible" :dismissableMask="true" modal header="Create Account">
-      <div class="flex flex-col gap-2">
-        <InputText v-model="createEmailInput" placeholder="Email" />
-        <InputText v-model="createUsernameInput" placeholder="Username" />
-        <InputText v-model="createPasswordInput" placeholder="Password" />
-      </div>
+      
+      <Form class="flex flex-col gap-2">
+        <InputText
+          v-model="createEmailInput"
+          placeholder="Email"
+          type="email"
+          autocomplete="email"
+        />
+        <InputText
+          v-model="createUsernameInput"
+          placeholder="Username"
+          type="username"
+          autocomplete="username"
+        />
+        <InputText
+          v-model="createPasswordInput"
+          placeholder="Password"
+          type="password"
+          autocomplete="new-password"
+        />
+      </Form>
 
       <template #footer>
         <Button @click="tryCreateAccount" severity="secondary" label="Create Account" />
