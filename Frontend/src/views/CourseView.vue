@@ -83,8 +83,6 @@ const id = computed(() => {
   return route.params.id;
 });
 
-console.log(id.value);
-
 const courseData = ref({
 
   "course_name": "COURSE_NAME",
@@ -144,7 +142,7 @@ const toggleVisibility = async (index: number,qIndex: number) => {
   console.log(visibleAnswers.value[0]);
 }
 
-axios.get('LINK TBD')
+axios.get('localhost:3000/api/courses/:c_id')
   .then(response => {
     response;
   })
