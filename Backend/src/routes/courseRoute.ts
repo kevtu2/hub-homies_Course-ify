@@ -5,8 +5,9 @@ import config from "../modules/dots";
 
 // import { db } from '../database/db';
 
-import Transcriptor from 'youtube-video-transcript';
+// import Transcriptor from 'youtube-video-transcript';
 
+import { YoutubeTranscript } from 'youtube-transcript';
 
 const router = Router();
 const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
@@ -15,9 +16,10 @@ router.options('/course', cors({ origin: '*' }));  // Preflight support
 
 // Interface for Transcriptor
 interface DataItem {
-    start: number;
-    duration: number;
     text: string;
+    duration: number;
+    offset: number;
+    lang: string;
 }
 
 // ChatGPT prompt
@@ -57,18 +59,15 @@ router.post('/course', async (req, res) => {
         var transcription;
 
         // Obtain transcription from youtube video
-        const result = await Transcriptor.getTranscript('https://www.youtube.com/watch?v=8geaZ0katu0')
-
-        if (result != null && !Array.isArray(result) && result.data) {
-            console.log(result.data);
-            transcription = (result.data as DataItem[]).map((item) => item.text).join(' ');
+        const result = await YoutubeTranscript.fetchTranscript('https://www.youtube.com/watch?v=P_fHJIYENdI&t=4s');
+        if (result != null) {
+            transcription = (result as DataItem[]).map((item) => item.text).join(' ');
         } else {
             const failure = "Failed to retrieve transcription for the video."
             console.log(failure);
             res.status(500).send({ message: failure});
             return;
         }
-
         // Query ChatGPT 4o-mini
         if (transcription != null) {
             const completion = await openai.chat.completions.create({
