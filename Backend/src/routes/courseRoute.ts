@@ -54,12 +54,12 @@ NOTE THAT each course has multiple topics in "topics".
 // Takes a transcript of a given youtube video and generates a course from it. 
 router.post('/course', async (req, res) => {
     try {
-        // const title = req.body.title;
-        // const link = req.body.link; 
+        const title = req.body.title;
+        const link = req.body.link; 
         var transcription;
 
         // Obtain transcription from youtube video
-        const result = await YoutubeTranscript.fetchTranscript('https://www.youtube.com/watch?v=P_fHJIYENdI&t=4s');
+        const result = await YoutubeTranscript.fetchTranscript(link);
         if (result != null) {
             transcription = (result as DataItem[]).map((item) => item.text).join(' ');
         } else {
@@ -68,6 +68,7 @@ router.post('/course', async (req, res) => {
             res.status(500).send({ message: failure});
             return;
         }
+
         // Query ChatGPT 4o-mini
         if (transcription != null) {
             const completion = await openai.chat.completions.create({
@@ -81,15 +82,19 @@ router.post('/course', async (req, res) => {
                 ],
                 store: false,
             });
+            
             console.log(completion.choices[0].message);
+            // Send the course details
+            res.status(200).send({ 
+                title: title,
+                course: completion.choices[0].message
+            });
         } else {
             const failure = "Failed to retrieve transcription for the video."
             console.log(failure);
             res.status(500).send({ message: failure});
             return;
         }
-        
-        res.status(200).send({ message : "Course successfully generated." });
     } catch (error) {
         console.log(error);
         res.status(500).send({ message : "Failed to generate course." });
