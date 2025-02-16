@@ -2,13 +2,15 @@ import { Knex } from 'knex';
 import { db } from './db';
 
 export async function setupDatabase() {
+  await clearAll();
+
   try {
     if (await db.schema.hasTable('users') == false) {
       await db.schema.createTable('users', (table: Knex.TableBuilder) => {
         table.increments('u_id').primary();
-        table.string('email').notNullable();
-        table.string('pwd').notNullable();
-        table.string('name').notNullable();
+        table.text('email').notNullable();
+        table.text('pwd').notNullable();
+        table.text('name').notNullable();
       });
     }
     
@@ -16,11 +18,16 @@ export async function setupDatabase() {
       await db.schema.createTable('courses', (table: Knex.TableBuilder) => {
         table.increments('c_id').primary();
         table.integer('u_id').unsigned().references('u_id').inTable('users').notNullable();
-        table.string('title').notNullable();
-        table.string('subject').notNullable();
-        table.string('link').notNullable();
-        table.string('added_date').notNullable();
+        table.text('title').notNullable();
+        table.text('subject').notNullable();
+        table.text('link').notNullable();
+        table.text('added_date').notNullable();
       });
+    }
+    if(await db.schema.hasColumn('courses', 'c_text') == false) {
+      await db.schema.alterTable('courses', (table: Knex.TableBuilder) => {
+        table.text('c_text').notNullable();
+      })
     }
 
     if(await db.schema.hasTable('sections') == false) {
@@ -28,8 +35,8 @@ export async function setupDatabase() {
         table.increments('s_id').primary();
         table.integer('c_id').unsigned().references('c_id').inTable('courses').notNullable();
         table.integer('position').unsigned().notNullable().unique();
-        table.string('s_name').notNullable();
-        table.string('s_text').notNullable();
+        table.text('s_name').notNullable();
+        table.text('s_text').notNullable();
       });
     }
 
@@ -47,13 +54,13 @@ export async function setupDatabase() {
         table.increments('q_id').primary();
         table.integer('s_id').unsigned().references('s_id').inTable('sections').notNullable();
         table.integer('position').unsigned().notNullable().unique();
-        table.string('q_text').notNullable();
+        table.text('q_text').notNullable();
         table.integer('q_ans').notNullable();
 
-        table.string('a1_text').notNullable();
-        table.string('a2_text').notNullable();
-        table.string('a3_text').notNullable();
-        table.string('a4_text').notNullable();
+        table.text('a1_text').notNullable();
+        table.text('a2_text').notNullable();
+        table.text('a3_text').notNullable();
+        table.text('a4_text').notNullable();
       });
     }
 
@@ -79,8 +86,8 @@ export async function setupDatabase() {
     if(await db.schema.hasTable('achievements') == false) {
       await db.schema.createTable('achievements', (table: Knex.TableBuilder) => {
         table.increments('ach_id').primary();
-        table.string('ach_name').notNullable();
-        table.string('ach_text').notNullable();
+        table.text('ach_name').notNullable();
+        table.text('ach_text').notNullable();
       });
     }
 
@@ -97,6 +104,22 @@ export async function setupDatabase() {
   } catch (error) {
     console.log('Failed to set up the database:', error);
   }
+}
+
+export async function clearAll() {
+  await db.raw('SET FOREIGN_KEY_CHECKS = 0');
+  await Promise.all([
+    db.schema.dropTableIfExists('achievements'),
+    db.schema.dropTableIfExists('courses'),
+    db.schema.dropTableIfExists('follows'),
+    db.schema.dropTableIfExists('has_achievement'),
+    db.schema.dropTableIfExists('questions'),
+    db.schema.dropTableIfExists('section_finished'),
+    db.schema.dropTableIfExists('sections'),
+    db.schema.dropTableIfExists('user_answered'),
+    db.schema.dropTableIfExists('users')
+  ]);
+  await db.raw('SET FOREIGN_KEY_CHECKS = 1');
 }
 
 /*
@@ -121,17 +144,17 @@ export async function setupDatabase() {
     // 2.1) "Users"
     await db.schema.createTable('Users', (table: Knex.TableBuilder) => {
       table.increments('u_id').primary();
-      table.string('email').notNullable();
-      table.string('pwd').notNullable();
-      table.string('name').notNullable();
+      table.text('email').notNullable();
+      table.text('pwd').notNullable();
+      table.text('name').notNullable();
     });
 
     // 2.2) "Courses"
     await db.schema.createTable('Courses', (table: Knex.TableBuilder) => {
       table.increments('id').primary();
-      table.string('title').notNullable();
-      table.string('subject').notNullable();
-      table.string('link').notNullable();
+      table.text('title').notNullable();
+      table.text('subject').notNullable();
+      table.text('link').notNullable();
       table.integer('u_id').unsigned().notNullable();
       table.timestamp('date_added').defaultTo(db.fn.now());
 
@@ -145,7 +168,7 @@ export async function setupDatabase() {
     // 2.3) "Sections" – Weak entity of "Courses" (composite PK: (order, c2_id))
     await db.schema.createTable('Sections', (table: Knex.TableBuilder) => {
       table.text('s_text').notNullable();
-      table.string('s_name').notNullable();
+      table.text('s_name').notNullable();
 
       // Composite key
       table.integer('order').unsigned().notNullable();
@@ -171,7 +194,7 @@ export async function setupDatabase() {
     await db.schema.createTable('Questions', (table: Knex.TableBuilder) => {
       table.increments('q_id').primary();
       table.text('text').notNullable();
-      table.string('right_answer').notNullable();
+      table.text('right_answer').notNullable();
 
       table.integer('section_order').unsigned().notNullable();
       table.integer('section_c2_id').unsigned().notNullable();

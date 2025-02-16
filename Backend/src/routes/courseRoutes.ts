@@ -107,12 +107,13 @@ router.get('/getCourses', async (req, res) => {
     
 });
 
-router.get('/courses/:id', async (req, res) => {
+router.get('/courses/:c_id', async (req, res) => {
     try {
-        const data = await db('Courses')
-            .select('*')
-            .where('id', req.params.id)
-            .leftJoin('Sections', 'Courses.id', 'Sections.c2_id')
+        const data = await db('Courses as c')
+            .select('c.*', 's.*', 'q.*')
+            .leftJoin('sections as s', 'c.s_id', '=', 's.s_id')
+            .leftJoin('questions as q', 's.s_id', '=', 'q.s_id')
+            .where('c.c_id', Number(req.params.c_id))
             .first();
         
         res.status(200).send(data);
