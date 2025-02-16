@@ -6,7 +6,9 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import { Form } from '@primevue/forms';
+import Toast from 'primevue/toast';
 
+import { successToast, errorToast } from './modules/toastHelper';
 import { useAuthStore } from './stores/auth';
 
 import router from '@/router';
@@ -72,8 +74,13 @@ async function tryLogin() {
     if(response.data != null) {
       Cookies.set('token', response.data.token);
       authStore.login(response.data.name, response.data.u_id);
+      loginDialogVisible.value = false;
+      successToast('Success', 'Logged in successfully');
+    } else {
+      errorToast('Error', 'Login unsuccessful');
     }
   } catch (error) {
+    errorToast('Error', 'Login unsuccessful');
     console.error(error);
   }
 }
@@ -89,7 +96,6 @@ async function tryStartupLogin() {
     });
 
     if(response.data != null) {
-      
       Cookies.set('token', response.data.token);  
       authStore.login(response.data.name, response.data.u_id);
     }
@@ -101,6 +107,7 @@ async function tryStartupLogin() {
 async function tryLogout() {
   Cookies.remove('token');
   authStore.logout();
+  successToast('Success', 'Logged out successfully');
 }
 
 const createAccountDialogVisible = ref(false);
@@ -117,8 +124,13 @@ async function tryCreateAccount() {
     if(response.data != null) {
       Cookies.set('token', response.data.token);
       authStore.login(response.data.name, response.data.u_id);
+      createAccountDialogVisible.value = false;
+      successToast('Success', 'Account created successfully');
+    } else {
+      errorToast('Error', 'Account creation unsuccessful');
     }
   } catch (error) {
+    errorToast('Error', 'Account creation unsuccessful');
     console.error(error); 
   }
 }
@@ -202,6 +214,8 @@ const u_id = computed(() => authStore.u_id);
         <Button @click="tryCreateAccount" severity="secondary" label="Create Account" />
       </template>
     </Dialog>
+
+    <Toast />
   </main>
 </template>
 

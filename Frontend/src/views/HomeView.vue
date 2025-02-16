@@ -2,21 +2,19 @@
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
-import Toast from 'primevue/toast';
+
+import { errorToast } from '../modules/toastHelper';
 
 import axios from 'axios';
 import { ref } from 'vue';
-import { useToast } from 'primevue/usetoast';
 
 const link = ref('');
 const title = ref('');
 const visible = ref(false);
 
-const toast = useToast();
-
 const submitTitle = async () => {
   if (!title.value.trim()) {
-    toast.add({ severity: 'error', summary: 'Warning', detail: 'You must provide a title!', life: 3000 })
+    errorToast('Warning', 'You must provide a title!');
   } else {
     try {
     await axios.post('http://localhost:3000/api/course',{
@@ -31,7 +29,7 @@ const submitTitle = async () => {
 
 const submitLink = async () => {
   if (!link.value.trim()) {
-    toast.add({ severity: 'error', summary: 'Warning', detail: 'You must provide a link!', life: 3000 })
+    errorToast('Warning', 'You must provide a link!');
   } else {
     visible.value=true;
   }
@@ -40,8 +38,6 @@ const submitLink = async () => {
 </script>
 
 <template>
-<Toast />
-
 <div class="flex flex-col items-center justify-center v-screen h-[80%] gap-5">
   <p class="text-5xl">COURSE-IFY</p>
   <p class="text-2xl mb-20">We make YouTube videos into an interactive course</p>
