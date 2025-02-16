@@ -143,16 +143,11 @@ router.post('/course', getDataOfToken, async (req, res) => {
   }
 });
 
-router.get('/getCourses', async (req, res) => {
-  //const token = req.headers['authorization'];
+router.get('/courses/getIds', async (req, res) => {
   try {
-    const courses = await db('mydatabase').select('c_id').from('Courses');
-    if (courses.length === 0) {
-      res.status(404).send({ message: 'No courses found.' });
-      return;
-    }
-
-    res.status(200).send(courses);
+    const data = await db('courses').select('c_id');
+    console.log(data);
+    res.status(200).send(data);
   } catch {
     console.error(Error);
     res.status(500).send({ message: 'Internal server error.' });

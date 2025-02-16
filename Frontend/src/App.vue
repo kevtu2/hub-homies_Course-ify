@@ -64,11 +64,7 @@ function addCourseToMenu(courseName: string, courseRoute: string) {
 
 onMounted(async () => {
   await tryStartupLogin();
-
-  addCourseToMenu('Course 1', '/course/1');
-  addCourseToMenu('Course 2', '/course/2');
-  addCourseToMenu('Course 3', '/course/3');
-  addCourseToMenu('Course 4', '/course/4');
+  await getCourses();
 });
 
 const loginEmailInput = ref('');
@@ -125,6 +121,18 @@ async function tryLogout() {
   Cookies.remove('token');
   authStore.logout();
   successToast('Success', 'Logged out successfully');
+}
+
+async function getCourses() {
+  try {
+    const courseIds = await axios.get('http://localhost:3000/api/courses/getIds');
+    for (let i = 0; i < Object.keys(courseIds.data).length; i++) {
+      addCourseToMenu(courseIds.data[i]['c_id'], `/course/${courseIds.data[i]['c_id']}`);
+    }
+    console.log("Retrieved courses successfully!");
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 const createAccountDialogVisible = ref(false);
