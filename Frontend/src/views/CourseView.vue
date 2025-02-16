@@ -24,7 +24,7 @@
                     <p class="mt-8 mb-8">{{ question.question }}</p>
                     <Form v-slot="$form" class="flex flex-col gap-4">
                       <div class="flex flex-col gap-2">
-                        <RadioButtonGroup @submit="checkAnswerRoutine(index, qIndex)" name="quiz" class="flex flex-col gap-4">
+                        <div @submit="checkAnswerRoutine(index, qIndex)" name="quiz" class="flex flex-col gap-4">
                           <div class="flex items-center gap-2">
                             <RadioButton inputId="a" v-model="selectedAnswer" value="1" :invalid="answerCorrectness"/>
                             <label for="a">{{ question.a }}</label>
@@ -41,7 +41,7 @@
                             <RadioButton inputId="d" v-model="selectedAnswer" value="4" :invalid="!answerCorrectness"/>
                             <label for="d">{{ question.d }}</label>
                           </div>
-                        </RadioButtonGroup>
+                        </div>
                       </div>
                       <Button v-if="!visibleAnswers[index][qIndex]" class="w-40" type="submit" severity="secondary" label="Submit" @click="checkAnswerRoutine(index,qIndex)" />
                       <Button v-if="visibleAnswers[index][qIndex]" class="w-40" type="button" severity="secondary" label="Hide the answer" @click="clearAnswerRoutine(index,qIndex)" />
@@ -161,7 +161,7 @@ const checkAnswerRoutine = (index: number, qIndex: number) => {
         } else {
           answerCorrectness.value = false;
         }
-        console.log("Answer correctness determination: ",answerCorrectness.value,"Real answer: ", realAnswer, ", selected answer: ",selectedAnswer.value);
+        console.log("Answer correctness determination: ",answerCorrectness.value,"Real answer: ", realAnswer, ", selected answer: ",selectedAnswer);
       } else {
         alert('Please select an option!');
         console.log("The selectedAnswer variable answer: ",selectedAnswer.value)
@@ -170,8 +170,6 @@ const checkAnswerRoutine = (index: number, qIndex: number) => {
     };
 
 const clearAnswerRoutine = (index: number, qIndex: number) => {
-  const answerCorrectness = ref(false);
-  const selectedAnswer = ref('');
   toggleVisibility(index,qIndex);
 }
 
