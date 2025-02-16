@@ -9,7 +9,7 @@ const JWT_SECRET = config.JWT_SECRET
 
 router.post('/auth/login', async (req, res) => {
     try {
-        const user = await db('Users')
+        const user = await db('users')
             .select('u_id', 'name')
             .where('email', req.body.email)
             .where('pwd', req.body.pwd).first();
@@ -29,7 +29,7 @@ router.post('/auth/login', async (req, res) => {
 
 router.post('/auth/tokenLogin', getDataOfToken, async (req, res) => {
     try {        
-        const user = await db('Users')
+        const user = await db('users')
             .select('u_id', 'name')
             .where('u_id', res.locals.u_id)
             .first();
@@ -48,6 +48,7 @@ router.post('/auth/tokenLogin', getDataOfToken, async (req, res) => {
 
         res.status(200).send(outputData);
     } catch (error) {
+        console.log(error)
         res.status(500).send({ message: 'Internal server error.' })
     }
 })
@@ -62,19 +63,19 @@ router.post('/auth/createAccount', async (req, res) => {
             return res.status(400).send({ message: 'Missing required fields.' });
         }
 
-        const existingUser = await db('Users').where('email', email).first();
+        const existingUser = await db('users').where('email', email).first();
         if (existingUser) {
             return res.status(400).send({ message: 'Email already exists.' });
         }
 
-        await db('Users')
+        await db('users')
             .insert({ 
                 'name': name,
                 'email': email, 
                 'pwd': pwd 
             });
 
-        const user = await db('Users')
+        const user = await db('users')
             .select('u_id', 'name')
             .where('email', email)
             .first();

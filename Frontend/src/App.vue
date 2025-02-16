@@ -7,6 +7,7 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import { Form } from '@primevue/forms';
 import Toast from 'primevue/toast';
+import FloatLabel from 'primevue/floatlabel';
 
 import { successToast, errorToast } from './modules/toastHelper';
 import { useAuthStore } from './stores/auth';
@@ -29,8 +30,18 @@ const courses = ref<Course[]>([])
 const items = computed(() => {
   return [
     {
-      label: 'Create Course',
-      icon: 'pi pi-home'
+      label: 'Create',
+      icon: 'pi pi-home',
+      command: () => {
+        router.push('/');
+      }
+    },
+    {
+      label: 'Dashboard',
+      icon: 'pi pi-chart-bar',
+      command: () => {
+        router.push('/dashboard');
+      }
     },
     {
       label: 'Courses',
@@ -146,7 +157,7 @@ const u_id = computed(() => authStore.u_id);
       <template #item="{ item, props, hasSubmenu, root }">
           <a class="flex items-center" v-bind="props.action">
               <span>{{ item.label }}</span>
-              <Badge v-if="item.badge" :class="{ 'ml-auto': !root, 'ml-2': root }" :value="item.badge" />
+              <Badge v-if="item.badge" :value="item.badge" />
               <span v-if="item.shortcut" class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1">{{ item.shortcut }}</span>
               <i v-if="hasSubmenu" :class="['pi pi-angle-down ml-auto', { 'pi-angle-down': root, 'pi-angle-right': !root }]"></i>
           </a>
@@ -166,20 +177,26 @@ const u_id = computed(() => authStore.u_id);
     <RouterView />
 
     <Dialog v-model:visible="loginDialogVisible" :dismissableMask="true" modal header="Login">
-      <Form class="flex flex-col gap-2">
-        <InputText 
-          v-model="loginEmailInput"
-          placeholder="Email"
-          type="email"
-          autocomplete="email"
-        />
+      <Form class="flex flex-col">
+        <FloatLabel class="mt-5">
+          <InputText 
+            v-model="loginEmailInput"
+            type="email"
+            autocomplete="email"
+            id="email"
+          />
+          <label for="email">Email</label>
+        </FloatLabel>
 
-        <InputText 
-          v-model="loginPasswordInput"
-          placeholder="Password" 
-          type="password"
-          autocomplete="current-password"
-        />
+        <FloatLabel class="mt-7">
+          <InputText 
+            v-model="loginPasswordInput"
+            type="password"
+            autocomplete="current-password"
+            id="password"
+          />
+          <label for="password">Password</label>
+        </FloatLabel>
       </Form>
 
       <template #footer>
@@ -189,25 +206,34 @@ const u_id = computed(() => authStore.u_id);
 
     <Dialog v-model:visible="createAccountDialogVisible" :dismissableMask="true" modal header="Create Account">
       
-      <Form class="flex flex-col gap-2">
-        <InputText
-          v-model="createEmailInput"
-          placeholder="Email"
-          type="email"
-          autocomplete="email"
-        />
-        <InputText
-          v-model="createUsernameInput"
-          placeholder="Username"
-          type="username"
-          autocomplete="username"
-        />
-        <InputText
-          v-model="createPasswordInput"
-          placeholder="Password"
-          type="password"
-          autocomplete="new-password"
-        />
+      <Form class="flex flex-col">
+        <FloatLabel class="mt-5">
+          <InputText
+            v-model="createEmailInput"
+            type="email"
+            autocomplete="email"
+            id="email"
+          />
+          <label for="email">Email</label>
+        </FloatLabel>
+        <FloatLabel class="mt-7">
+          <InputText
+            v-model="createUsernameInput"
+            type="username"
+            autocomplete="username"
+            id="username"
+          />
+          <label for="username">Username</label>
+        </FloatLabel>
+        <FloatLabel class="mt-7">
+          <InputText
+            v-model="createPasswordInput"
+            type="password"
+            autocomplete="new-password"
+            id="password"
+          />
+          <label for="password">Password</label>
+        </FloatLabel>
       </Form>
 
       <template #footer>

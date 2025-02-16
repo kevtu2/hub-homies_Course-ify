@@ -15,7 +15,7 @@ export async function getDataOfToken(req: Request, res: Response, next: NextFunc
     try {
         const tokenData = jwt.verify(token, config.JWT_SECRET as Secret) as { u_id: number };
 
-        const data = await db('Users')
+        const data = await db('users')
             .select(1)
             .where('u_id', tokenData.u_id)
             .first();
@@ -44,7 +44,7 @@ export async function getDataOfTokenIfAvailable(req: Request, res: Response, nex
     try {
         const tokenData = jwt.verify(token, config.JWT_SECRET as Secret) as { u_id: number };
 
-        const data = await db('Users')
+        const data = await db('users')
             .select(1)
             .where('u_id', tokenData.u_id)
             .first();
