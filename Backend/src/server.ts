@@ -10,7 +10,7 @@ import followRoutes from './routes/followRoutes';
 import cors from 'cors';
 import { setupDatabase } from './database/dbSetup';
 
-const app = express();  // Use app instead of router for clarity
+const app = express(); // Use app instead of router for clarity
 const PORT = 3000;
 
 // Enable CORS for all origins
