@@ -2,6 +2,8 @@
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
+import ProgressSpinner from 'primevue/progressspinner';
+
 
 import { errorToast } from '../modules/toastHelper';
 import Cookies from 'js-cookie';
@@ -14,6 +16,7 @@ const title = ref('');
 const visible = ref(false);
 
 const submitTitle = async () => {
+  loading.value = true;
   if (!title.value.trim()) {
     errorToast('Warning', 'You must provide a title!');
   } else {
@@ -31,6 +34,7 @@ const submitTitle = async () => {
       console.error('Error submitting link:', error);
     }
   }
+  loading.value = false;
 };
 
 const submitLink = async () => {
@@ -40,12 +44,15 @@ const submitLink = async () => {
     visible.value = true;
   }
 };
+
+const loading = ref(false);
 </script>
 
 <template>
   <div class="flex flex-col items-center justify-center v-screen h-[80%] gap-5">
     <p class="text-5xl">COURSE-IFY</p>
     <p class="text-2xl mb-20">We make YouTube videos into an interactive course</p>
+
     <div class="flex items-center justify-center w-[80%] gap-4">
       <InputText
         v-model="link"
@@ -62,13 +69,16 @@ const submitLink = async () => {
     modal
     header="Edit the Course Title"
     :style="{ width: '25rem' }"
+    class="flex content-center items-center"
   >
-    <div class="flex items-center gap-4 mb-4">
+    <ProgressSpinner v-if="loading" />
+
+    <div class="flex items-center gap-4 mb-4" v-if="!loading">
       <label for="course title" class="font-semibold w-24">Title</label>
       <InputText v-model="title" id="course title" class="flex-auto" autocomplete="off" />
     </div>
     <div class="flex justify-end gap-2">
-      <Button type="button" label="Save" @click="submitTitle"></Button>
+      <Button type="button" label="Save" @click="submitTitle" v-if="!loading" ></Button>
     </div>
   </Dialog>
 </template>
