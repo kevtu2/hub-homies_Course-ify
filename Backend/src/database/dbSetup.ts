@@ -6,76 +6,91 @@ export async function setupDatabase() {
     // Create all tables first
     await createTables();
 
-    // Insert initial data in transaction
-    await db.transaction(async trx => {
-      // Insert or update users
-      await trx('users').insert({
-        email: 'user1@example.com',
-        pwd: 'password1',
-        name: 'User One'
-      }).onConflict('email').merge();
+    await addFillerData();
 
-      await trx('users').insert({
-        email: 'user2@example.com',
-        pwd: 'password2',
-        name: 'User Two'
-      }).onConflict('email').merge();
+    console.log('Database setup completed successfully.');
+  } catch (error) {
+    console.error('Database setup failed:', error);
+  }
+}
 
-      // Get user IDs
-      const user1 = await trx('users')
-        .where('email', 'user1@example.com')
-        .first();
-      const user2 = await trx('users')
-        .where('email', 'user2@example.com')
-        .first();
+async function addFillerData() {
+  // Insert initial data in transaction
 
-      // Insert or update courses
-      await trx('courses').insert({
-        u_id: user1.u_id,
-        title: 'Intro to Programming',
-        subject: 'Computer Science',
-        link: 'https://www.example.com',
-        added_date: '2023-02-01',
-        c_text: "goodbye"
-      }).onConflict('title').merge(['added_date', 'c_text', 'link', 'subject']);
+  const dataInAlr = await db.select(1).where('u_id', 1).from('users').first()
+  if(dataInAlr !== undefined) {
+    return;
+  }
 
-      await trx('courses').insert({
-        u_id: user2.u_id,
-        title: 'Advanced Mathematics',
-        subject: 'Mathematics',
-        link: 'https://www.math.com',
-        added_date: '2023-02-02',
-        c_text: "hello"
-      }).onConflict('title').merge(['added_date', 'c_text', 'link', 'subject']);
+  await db.transaction(async trx => {
+    // Insert or update users
+    await trx('users').insert({
+      email: 'user1@example.com',
+      pwd: 'password1',
+      name: 'User One'
+    }).onConflict('email').merge();
 
-      // Get course IDs
-      const course1 = await trx('courses')
-        .where('title', 'Intro to Programming')
-        .first();
+    await trx('users').insert({
+      email: 'user2@example.com',
+      pwd: 'password2',
+      name: 'User Two'
+    }).onConflict('email').merge();
 
-      // Insert sections
-      await trx('sections').insert([
-        {
-          c_id: course1.c_id,
-          position: 1,
-          s_name: 'Section 1',
-          s_text: 'Introduction to Variables'
-        },
-        {
-          c_id: course1.c_id,
-          position: 2,
-          s_name: 'Section 2',
-          s_text: 'Control Structures'
-        }
-      ]).onConflict(['c_id', 'position']).merge();
+    // Get user IDs
+    const user1 = await trx('users')
+      .where('email', 'user1@example.com')
+      .first();
+    const user2 = await trx('users')
+      .where('email', 'user2@example.com')
+      .first();
 
-      // Get section IDs
-      const section1 = await trx('sections')
-        .where({
-          c_id: course1.c_id,
-          position: 1
-        })
-        .first();
+    // Insert or update courses
+    await trx('courses').insert({
+      u_id: user1.u_id,
+      title: 'Intro to Programming',
+      subject: 'Computer Science',
+      link: 'https://www.example.com',
+      added_date: '2023-02-01',
+      c_text: "goodbye"
+    }).onConflict('title').merge(['added_date', 'c_text', 'link', 'subject']);
+
+    await trx('courses').insert({
+      u_id: user2.u_id,
+      title: 'Advanced Mathematics',
+      subject: 'Mathematics',
+      link: 'https://www.math.com',
+      added_date: '2023-02-02',
+      c_text: "hello"
+    }).onConflict('title').merge(['added_date', 'c_text', 'link', 'subject']);
+
+    // Get course IDs
+    const course1 = await trx('courses')
+      .where('title', 'Intro to Programming')
+      .first();
+
+    // Insert sections
+    await trx('sections').insert([
+      {
+        c_id: course1.c_id,
+        position: 1,
+        s_name: 'Section 1',
+        s_text: 'Introduction to Variables'
+      },
+      {
+        c_id: course1.c_id,
+        position: 2,
+        s_name: 'Section 2',
+        s_text: 'Control Structures'
+      }
+    ]).onConflict(['c_id', 'position']).merge();
+
+    // Get section IDs
+    const section1 = await trx('sections')
+      .where({
+        c_id: course1.c_id,
+        position: 1
+      })
+      .first();
 
       // Insert questions
       await trx('questions').insert([
@@ -101,23 +116,18 @@ export async function setupDatabase() {
         }
       ]).onConflict(['s_id', 'position']).merge();
 
-      // Insert achievements
-      await trx('achievements').insert([
-        { ach_name: 'First Course', ach_text: 'Complete your first course' },
-        { ach_name: 'Perfect Score', ach_text: 'Get 100% on a quiz' }
-      ]).onConflict('ach_name').merge();
+    // Insert achievements
+    await trx('achievements').insert([
+      { ach_name: 'First Course', ach_text: 'Complete your first course' },
+      { ach_name: 'Perfect Score', ach_text: 'Get 100% on a quiz' }
+    ]).onConflict('ach_name').merge();
 
-      // Insert follows
-      await trx('follows').insert([
-        { flwer: user1.u_id, flwee: user2.u_id },
-        { flwer: user2.u_id, flwee: user1.u_id }
-      ]).onConflict(['flwer', 'flwee']).ignore();
-    });
-
-    console.log('Database setup completed successfully.');
-  } catch (error) {
-    console.error('Database setup failed:', error);
-  }
+    // Insert follows
+    await trx('follows').insert([
+      { flwer: user1.u_id, flwee: user2.u_id },
+      { flwer: user2.u_id, flwee: user1.u_id }
+    ]).onConflict(['flwer', 'flwee']).ignore();
+  });
 }
 
 async function createTables() {
