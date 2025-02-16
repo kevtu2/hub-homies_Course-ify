@@ -9,11 +9,16 @@ import { errorToast } from '../modules/toastHelper';
 import Cookies from 'js-cookie';
 
 import axios from 'axios';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useAuthStore } from '../stores/auth';
 
 const link = ref('');
 const title = ref('');
 const visible = ref(false);
+
+const authStore = useAuthStore();
+
+const isLoggedIn = computed(() => authStore.isLoggedIn);
 
 const submitTitle = async () => {
   loading.value = true;
@@ -31,14 +36,16 @@ const submitTitle = async () => {
         },
       });
     } catch (error) {
-      console.error('Error submitting link:', error);
+      errorToast('Error', 'Error submitting link:' + error);
     }
   }
   loading.value = false;
 };
 
 const submitLink = async () => {
-  if (!link.value.trim()) {
+  if(!isLoggedIn.value) {
+    errorToast('Warning', 'You must be logged in to submit a link!');
+  } else if (!link.value.trim()) {
     errorToast('Warning', 'You must provide a link!');
   } else {
     visible.value = true;
