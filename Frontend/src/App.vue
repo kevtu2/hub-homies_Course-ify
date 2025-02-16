@@ -20,6 +20,13 @@ const items = ref([
       router.push({ name: 'about' });
     },
   },
+  {
+    label: 'course',
+    icon: 'pi pi-question-circle',
+    command: () => {
+      router.push({ name: 'course' });
+    },
+  },
 ]);
 </script>
 
