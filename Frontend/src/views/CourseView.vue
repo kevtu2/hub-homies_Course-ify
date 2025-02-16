@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import axios from 'axios';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
@@ -79,7 +79,12 @@ import { computed } from 'vue';
 
 const route = useRoute();
 
-const id = computed(() => {
+onMounted(async () => {
+  await getCourseData(Number(route.params.id));
+});
+
+const id = computed(async () => {
+  await getCourseData(Number(route.params.id));
   return route.params.id;
 });
 
@@ -142,11 +147,15 @@ const toggleVisibility = async (index: number,qIndex: number) => {
   console.log(visibleAnswers.value[0]);
 }
 
-axios.get('localhost:3000/api/courses/' + id)
-  .then(response => {
-    response;
-  })
-  .catch(error => console.error('Error: ', error))
+async function getCourseData(c_id : Number) {
+  try {
+    const response = await axios.get('http://localhost:3000/api/courses/' + c_id);
+    courseData.value = response.data;
+    console.log(courseData.value);
+  } catch (error) {
+    console.error('Error: ', error);
+  }
+}
 </script>
 
 <style scoped>
