@@ -20,6 +20,7 @@ const router = createRouter({
       component: () => import('../views/CourseView.vue'),
       props: true,
     },
+    {
       path: '/backendTest',
       name: 'backendTest',
       component: () => import('../views/BackendTestView.vue'),

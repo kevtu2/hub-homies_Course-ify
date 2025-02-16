@@ -5,10 +5,6 @@ import OpenAI from 'openai';
 import config from '../modules/dots';
 import { getDataOfTokenIfAvailable } from '../middleware/tokenCheckerMiddleware';
 
-// import { db } from '../database/db';
-
-// import Transcriptor from 'youtube-video-transcript';
-
 import { YoutubeTranscript } from 'youtube-transcript';
 
 const router = Router();
