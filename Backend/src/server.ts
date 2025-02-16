@@ -1,24 +1,46 @@
 import express from 'express';
 import bookRoutes from './routes/bookRoutes';
+
+import authRoutes from './routes/authRoutes';
+import courseRoutes from './routes/courseRoutes';
+import questionRoutes from './routes/questionRoutes';
+import sectionRoutes from './routes/sectionRoutes';
+import followRoutes from './routes/followRoutes';
+
 import cors from 'cors';
 import { setupDatabase } from './database/dbSetup';
 
-const router = express();
-
+const app = express(); // Use app instead of router for clarity
 const PORT = 3000;
 
-router.use(express.json());
-router.use(express.urlencoded({ extended: true }));
-router.use(cors());
+// Enable CORS for all origins
+app.use(cors());
+app.options('*', cors());
 
+// Middleware to parse JSON and URL-encoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Setup the database
 setupDatabase();
 
-router.get('/', (req, res) => {
+// Base route
+app.get('/', (req, res) => {
   res.send('Successful response.');
 });
 
-router.use('/api', bookRoutes);
+app.use('/api', bookRoutes);
 
-router.listen(PORT, () => {
+app.use('/api', authRoutes);
+
+app.use('/api', courseRoutes);
+
+app.use('/api', questionRoutes);
+
+app.use('/api', sectionRoutes);
+
+app.use('/api', followRoutes);
+
+app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

@@ -12,9 +12,8 @@ import { definePreset } from '@primevue/themes';
 
 import App from './App.vue';
 import router from './router';
-import { Toast } from 'primevue';
 
-const app = createApp(App);
+export const app = createApp(App);
 
 app.use(createPinia());
 app.use(ToastService);
