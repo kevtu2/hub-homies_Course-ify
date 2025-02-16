@@ -74,7 +74,19 @@ import Button from 'primevue/button';
 import RadioButton from 'primevue/radiobutton';
 import RadioButtonGroup from 'primevue/radiobuttongroup';
 
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+
+const route = useRoute();
+
+const id = computed(() => {
+  return route.params.id;
+});
+
+console.log(id.value);
+
 const courseData = ref({
+
   "course_name": "COURSE_NAME",
   "course_summary": "COURSE_SUMMARY",
   "sections": [
