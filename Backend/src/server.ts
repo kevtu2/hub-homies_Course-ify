@@ -1,7 +1,7 @@
 import express from 'express';
 import bookRoutes from './routes/bookRoutes';
 
-import authRoutes from './routes/authRoutes';
+//import authRoutes from './routes/authRoutes';
 import courseRoutes from './routes/courseRoutes';
 
 import cors from 'cors';
@@ -23,22 +23,19 @@ setupDatabase();
 
 // API routes
 app.use('/api', bookRoutes);
-app.use('/api', courseRoute);
+app.use('/api', courseRoutes);
 
 // Base route
 app.get('/', (req, res) => {
   res.send('Successful response.');
 });
 
-// Start the server
+app.use('/api', bookRoutes);
+
+//app.use('/api', authRoutes);
+
+app.use('/api', courseRoutes);
+
 app.listen(PORT, () => {
-
-router.use('/api', bookRoutes);
-
-router.use('/api', authRoutes);
-
-router.use('/api', courseRoutes);
-
-router.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

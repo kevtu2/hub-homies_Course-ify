@@ -1,3 +1,4 @@
+/*
 import { Router } from 'express';
 import { db } from '../database/db';
 import config from '../modules/dots';
@@ -51,3 +52,4 @@ router.post('/createAccount', async (req, res) => {
 })
 
 export default router;
+*/
