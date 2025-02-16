@@ -1,6 +1,9 @@
 import express from 'express';
 import bookRoutes from './routes/bookRoutes';
-import courseRoute from './routes/courseRoute';
+
+import authRoutes from './routes/authRoutes';
+import courseRoutes from './routes/courseRoutes';
+
 import cors from 'cors';
 import { setupDatabase } from './database/dbSetup';
 
@@ -29,5 +32,13 @@ app.get('/', (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
+
+router.use('/api', bookRoutes);
+
+router.use('/api', authRoutes);
+
+router.use('/api', courseRoutes);
+
+router.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
