@@ -4,6 +4,7 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 
 import { errorToast } from '../modules/toastHelper';
+import Cookies from 'js-cookie';
 
 import axios from 'axios';
 import { ref } from 'vue';
@@ -20,6 +21,11 @@ const submitTitle = async () => {
       await axios.post('http://localhost:3000/api/course', {
         link: link.value,
         title: title.value,
+      },
+      {
+        headers: {
+          authorization: Cookies.get('token'),
+        },
       });
     } catch (error) {
       console.error('Error submitting link:', error);

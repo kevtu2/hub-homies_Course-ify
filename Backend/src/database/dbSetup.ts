@@ -83,7 +83,7 @@ export async function setupDatabase() {
           s_id: section1.s_id,
           position: 1,
           q_text: 'What is a variable?',
-          q_ans: 1,
+          q_ans: 'a',
           a1_text: 'A storage location',
           a2_text: 'A data type',
           a3_text: 'A function',
@@ -93,7 +93,7 @@ export async function setupDatabase() {
           s_id: section1.s_id,
           position: 2,
           q_text: 'Which keyword declares a variable in JavaScript?',
-          q_ans: 2,
+          q_ans: 'b',
           a1_text: 'varr',
           a2_text: 'var',
           a3_text: 'variable',
@@ -126,8 +126,8 @@ async function createTables() {
     await db.schema.createTable('users', (table: Knex.TableBuilder) => {
       table.increments('u_id').primary();
       table.string('email', 255).notNullable().unique();
-      table.string('pwd', 255).notNullable();
-      table.string('name', 255).notNullable();
+      table.text('pwd').notNullable();
+      table.text('name').notNullable();
     });
   }
 
@@ -136,10 +136,10 @@ async function createTables() {
     await db.schema.createTable('courses', (table: Knex.TableBuilder) => {
       table.increments('c_id').primary();
       table.integer('u_id').unsigned().references('u_id').inTable('users').notNullable();
-      table.string('title', 255).notNullable().unique();
-      table.string('subject', 255).notNullable();
+      table.text('title').notNullable();
+      table.text('subject').notNullable();
       table.text('link').notNullable();
-      table.date('added_date').notNullable();
+      table.timestamp('added_date').notNullable().defaultTo(db.fn.now());
       table.text('c_text').notNullable();
     });
   }
@@ -150,9 +150,8 @@ async function createTables() {
       table.increments('s_id').primary();
       table.integer('c_id').unsigned().references('c_id').inTable('courses').notNullable();
       table.integer('position').unsigned().notNullable();
-      table.string('s_name', 255).notNullable();
+      table.text('s_name').notNullable();
       table.text('s_text').notNullable();
-      table.unique(['c_id', 'position']);
     });
   }
 
@@ -163,13 +162,23 @@ async function createTables() {
       table.integer('s_id').unsigned().references('s_id').inTable('sections').notNullable();
       table.integer('position').unsigned().notNullable();
       table.text('q_text').notNullable();
-      table.integer('q_ans').notNullable().checkBetween([1, 4]);
+      table.string('q_ans', 1).notNullable().checkBetween(['a', 'd']);
       table.text('a1_text').notNullable();
       table.text('a2_text').notNullable();
       table.text('a3_text').notNullable();
       table.text('a4_text').notNullable();
-      table.unique(['s_id', 'position']);
     });
+  }
+
+  if(!await db.schema.hasTable('question_answered')) {
+    await db.schema.createTable('question_answered', (table: Knex.TableBuilder) => {
+      table.increments('a_id').primary();
+      table.integer('u_id').unsigned().references('u_id').inTable('users').notNullable();
+      table.integer('q_id').unsigned().references('q_id').inTable('questions').notNullable();
+      table.integer('a_picked').unsigned()
+      table.integer('a_date').unsigned()
+      table.timestamp('date_answered').defaultTo(db.fn.now());
+    })
   }
 
   // Section Finished table

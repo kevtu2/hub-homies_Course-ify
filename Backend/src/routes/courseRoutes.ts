@@ -3,7 +3,7 @@ import { db } from '../database/db';
 import cors from 'cors';
 import OpenAI from 'openai';
 import config from '../modules/dots';
-import { getDataOfTokenIfAvailable } from '../middleware/tokenCheckerMiddleware';
+import { getDataOfToken } from '../middleware/tokenCheckerMiddleware';
 import { YoutubeTranscript } from 'youtube-transcript';
 import { addCourseOutputToDatabase } from '../modules/dbAddHelper';
 
@@ -61,7 +61,7 @@ NOTE THAT each course has multiple topics in "topics".
 `;
 
 // Takes a transcript of a given youtube video and generates a course from it.
-router.post('/course', getDataOfTokenIfAvailable, async (req, res) => {
+router.post('/course', getDataOfToken, async (req, res) => {
   try {
     //@ts-ignore
     const title = req.body.title;
@@ -115,9 +115,11 @@ router.post('/course', getDataOfTokenIfAvailable, async (req, res) => {
         courseJson = JSON.parse(formatJson);
       }
 
-      console.log(courseJson);
-
       console.log("Adding course to db..");
+
+      courseJson['u_id'] = 1;
+      courseJson['link'] = link;
+
       await addCourseOutputToDatabase(courseJson);
       res.status(200).send({
         message: 'Successfully generated the course.',
