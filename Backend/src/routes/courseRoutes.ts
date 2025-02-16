@@ -104,6 +104,19 @@ router.post('/course', async (req, res) => {
 
 router.get('/getCourses', async (req, res) => {
     //const token = req.headers['authorization'];
+    try{
+        const courses = await db('mydatabase').select('c_id').from('Courses');
+        if (courses.length === 0) {
+            res.status(404).send({ message: 'No courses found.' });
+            return;
+        }
+
+        res.status(200).send(courses);
+    }
+    catch{
+        console.error(Error);
+        res.status(500).send({ message: 'Internal server error.' });
+    }
     
 });
 

@@ -13,6 +13,10 @@ export async function setupDatabase() {
         table.text('name').notNullable();
       });
     }
+    await db('users').insert([
+      { email: 'user1@example.com', pwd: 'password1', name: 'User One' },
+      { email: 'user2@example.com', pwd: 'password2', name: 'User Two' }
+    ]);
     
     if (await db.schema.hasTable('courses') == false) {
       await db.schema.createTable('courses', (table: Knex.TableBuilder) => {
@@ -29,7 +33,10 @@ export async function setupDatabase() {
         table.text('c_text').notNullable();
       })
     }
-
+    await db('courses').insert([
+      { u_id: 1, title: 'Intro to Programming', subject: 'Computer Science', link: 'https://www.example.com', added_date: '2023-02-01' },
+      { u_id: 2, title: 'Advanced Mathematics', subject: 'Mathematics', link: 'https://www.math.com', added_date: '2023-02-02' }
+    ]);
     if(await db.schema.hasTable('sections') == false) {
       await db.schema.createTable('sections', (table: Knex.TableBuilder) => {
         table.increments('s_id').primary();
@@ -39,6 +46,10 @@ export async function setupDatabase() {
         table.text('s_text').notNullable();
       });
     }
+    await db('sections').insert([
+      { c_id: 1, position: 1, s_name: 'Section 1', s_text: 'Introduction to Variables' },
+      { c_id: 1, position: 2, s_name: 'Section 2', s_text: 'Control Structures' }
+    ]);
 
     if(await db.schema.hasTable('section_finished') == false) {
       await db.schema.createTable('section_finished', (table: Knex.TableBuilder) => {
@@ -63,6 +74,10 @@ export async function setupDatabase() {
         table.text('a4_text').notNullable();
       });
     }
+    await db('questions').insert([
+      { s_id: 1, position: 1, q_text: 'What is a variable?', q_ans: 1, a1_text: 'A storage location', a2_text: 'A data type', a3_text: 'A function', a4_text: 'None of the above' },
+      { s_id: 1, position: 2, q_text: 'Which keyword declares a variable in JavaScript?', q_ans: 2, a1_text: 'varr', a2_text: 'var', a3_text: 'variable', a4_text: 'v' }
+    ]);
 
     if(await db.schema.hasTable('user_answered') == false) {
       await db.schema.createTable('user_answered', (table: Knex.TableBuilder) => {
@@ -104,6 +119,7 @@ export async function setupDatabase() {
   } catch (error) {
     console.log('Failed to set up the database:', error);
   }
+  
 }
 
 export async function clearAll() {
