@@ -3,6 +3,9 @@ import bookRoutes from './routes/bookRoutes';
 
 import authRoutes from './routes/authRoutes';
 import courseRoutes from './routes/courseRoutes';
+import questionRoutes from './routes/questionRoutes';
+import sectionRoutes from './routes/sectionRoutes';
+import followRoutes from './routes/followRoutes';
 
 import cors from 'cors';
 import { setupDatabase } from './database/dbSetup';
@@ -21,10 +24,6 @@ app.use(express.urlencoded({ extended: true }));
 // Setup the database
 setupDatabase();
 
-// API routes
-app.use('/api', bookRoutes);
-app.use('/api', courseRoutes);
-
 // Base route
 app.get('/', (req, res) => {
   res.send('Successful response.');
@@ -35,6 +34,12 @@ app.use('/api', bookRoutes);
 app.use('/api', authRoutes);
 
 app.use('/api', courseRoutes);
+
+app.use('/api', questionRoutes);
+
+app.use('/api', sectionRoutes);
+
+app.use('/api', followRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
