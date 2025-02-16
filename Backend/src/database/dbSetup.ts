@@ -51,34 +51,20 @@ export async function setupDatabase() {
       // Composite key
       table.integer('order').unsigned().notNullable();
       table.integer('c2_id').unsigned().notNullable();
-      table.primary(['order', 'c2_id']);
+      table.integer('u2_id').unsigned().notNullable();
+      table.timestamp('f_date').notNullable();
+      table.primary(['order', 'c2_id', 'u2_id']);
 
       table
         .foreign('c2_id')
         .references('id')
         .inTable('Courses')
         .onDelete('CASCADE');
-    });
-
-    // 2.4) "Sections_Finished" – Relationship between "Users" & "Sections" w/ attribute f_date
-    await db.schema.createTable('Sections_Finished', (table: Knex.TableBuilder) => {
-      table.integer('u_id').unsigned().notNullable();
-      table.integer('order').unsigned().notNullable();
-      table.integer('c2_id').unsigned().notNullable();
-      table.timestamp('f_date').defaultTo(db.fn.now());
-
-      table.primary(['u_id', 'order', 'c2_id']);
 
       table
-        .foreign('u_id')
+        .foreign('u2_id')
         .references('u_id')
         .inTable('Users')
-        .onDelete('CASCADE');
-
-      table
-        .foreign(['order', 'c2_id'])
-        .references(['order', 'c2_id'])
-        .inTable('Sections')
         .onDelete('CASCADE');
     });
 
@@ -90,10 +76,11 @@ export async function setupDatabase() {
 
       table.integer('section_order').unsigned().notNullable();
       table.integer('section_c2_id').unsigned().notNullable();
+      table.integer('section_u2_id').unsigned().notNullable();
 
       table
-        .foreign(['section_order', 'section_c2_id'])
-        .references(['order', 'c2_id'])
+        .foreign(['section_order', 'section_c2_id', 'section_u2_id'])
+        .references(['order', 'c2_id', 'u2_id'])
         .inTable('Sections')
         .onDelete('CASCADE');
     });
