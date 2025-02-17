@@ -143,10 +143,10 @@ const courseData = ref({
 const mapAnswer: {
   [key: string]: string;
 } = {
-  1: 'A',
-  2: 'B',
-  3: 'C',
-  4: 'D',
+  '1': 'A',
+  '2': 'B',
+  '3': 'C',
+  '4': 'D',
   'A': 'A',
   'B': 'B',
   'C': 'C',
@@ -166,7 +166,7 @@ const checkAnswerRoutine = (index: number, qIndex: number) => {
         return;
       }
       if (selectedAnswer.value !== null) {
-        if (mapAnswer[propsedAnswer] == realAnswer) {
+        if (propsedAnswer == realAnswer) {
           answerCorrectness.value[index][qIndex] = true;
         } else {
           answerCorrectness.value[index][qIndex] = false;
@@ -212,22 +212,20 @@ body {
 }
 
 .fancy-text {
-  font-size: 3rem;
-  /* Large size for visibility */
-  font-weight: bold;
-  /* Bold text */
-  color: #228B22;
-  /* Green text color (center) */
+  font-size: 3rem; /* Large size for visibility */
+  font-weight: bold; /* Bold text */
+  color: #4A90E2; /* Modern blue text color */
 
-  /* Multiple shadows to create a gold outline around the green text */
-  text-shadow:
-    -2px 0 #E0C261,
-    2px 0 #E0C261,
-    0 2px #E0C261,
-    0 -2px #E0C261,
-    2px 2px #E0C261,
-    -2px -2px #E0C261,
-    2px -2px #E0C261,
-    -2px 2px #E0C261;
+  /* Multiple shadows to create a subtle blue outline around the text */
+  /* text-shadow:
+    -2px 0 #A2B9E8,
+    2px 0 #A2B9E8,
+    0 2px #A2B9E8,
+    0 -2px #A2B9E8,
+    2px 2px #A2B9E8,
+    -2px -2px #A2B9E8,
+    2px -2px #A2B9E8,
+    -2px 2px #A2B9E8; */
 }
+
 </style>
