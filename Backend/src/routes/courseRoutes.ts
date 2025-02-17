@@ -139,7 +139,7 @@ router.post('/course', getDataOfToken, async (req, res) => {
 
 router.get('/courses/getIds', async (req, res) => {
   try {
-    const data = await db('courses').select('title', 'c_id');
+    const data = await db('courses').select('title', 'c_id', 'added_date', 'subject');
     res.status(200).send(data);
   } catch {
     console.error(Error);
@@ -169,8 +169,8 @@ interface Course {
     course_name: string;
     course_subject: string;
     course_summary: string;
-    sections: Section[],
-    link: string
+    link: string;
+    sections: Section[]
 }
 
 router.get('/courses/:c_id', async (req, res) => {
@@ -187,7 +187,7 @@ router.get('/courses/:c_id', async (req, res) => {
         "course_name": courseData[0].title,
         "course_subject": courseData[0].subject,
         "course_summary": courseData[0].c_text,
-        "link": courseData[0],
+        "link": courseData[0].link,
         "sections": []
     }
 

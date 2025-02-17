@@ -52,9 +52,9 @@ const items = computed(() => {
   ];
 });
 
-function addCourseToMenu(courseName: string, courseRoute: string) {
+function addCourseToMenu(courseString: string, courseRoute: string) {
   courses.value.push({
-    label: courseName,
+    label: courseString,
     route: courseRoute,
     command: () => {
       router.push(courseRoute);
@@ -127,7 +127,7 @@ async function getCourses() {
   try {
     const courseIds = await axios.get('http://localhost:3000/api/courses/getIds');
     for (let i = 0; i < Object.keys(courseIds.data).length; i++) {
-      addCourseToMenu(courseIds.data[i]['title'], `/course/${courseIds.data[i]['c_id']}`);
+      addCourseToMenu(courseIds.data[i]['title'] + ' - ' + courseIds.data[i]['subject'] + ' - ' + new Date(courseIds.data[i]['added_date']).toLocaleDateString(), `/course/${courseIds.data[i]['c_id']}`);
     }
     console.log("Retrieved courses successfully!");
   } catch (error) {
