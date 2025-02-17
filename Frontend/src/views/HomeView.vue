@@ -3,7 +3,7 @@ import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import ProgressSpinner from 'primevue/progressspinner';
-
+import { successToast } from '../modules/toastHelper';
 
 import { errorToast } from '../modules/toastHelper';
 import Cookies from 'js-cookie';
@@ -35,10 +35,12 @@ const submitTitle = async () => {
           authorization: Cookies.get('token'),
         },
       });
+      successToast("New Course Created!", "Your new course is ready to go!");
     } catch (error) {
       errorToast('Error', 'Error submitting link:' + error);
     }
   }
+
   loading.value = false;
 };
 

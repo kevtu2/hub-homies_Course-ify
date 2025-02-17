@@ -169,13 +169,14 @@ interface Course {
     course_name: string;
     course_subject: string;
     course_summary: string;
+    link: string;
     sections: Section[]
 }
 
 router.get('/courses/:c_id', async (req, res) => {
   try {
     const courseData = await db('courses as c')
-        .select('c.title', 'c.subject', 'c.c_text')
+        .select('c.title', 'c.subject', 'c.c_text', 'c.link')
         .where('c.c_id', '=', req.params.c_id);
     
     const sectionData = await db('sections as s')
@@ -187,6 +188,7 @@ router.get('/courses/:c_id', async (req, res) => {
         "course_name": courseData[0].title,
         "course_subject": courseData[0].subject,
         "course_summary": courseData[0].c_text,
+        "link": courseData[0].link,
         "sections": []
     }
 
