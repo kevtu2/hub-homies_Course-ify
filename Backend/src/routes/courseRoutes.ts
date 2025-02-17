@@ -22,7 +22,7 @@ interface DataItem {
 
 
 // ChatGPT prompt
-const prompt = `You will receive a body of text which is the transcription of an educational video. You will summarize and condense key concepts into different sections based on the course name and the transcription. DO NOT provide more than 10 sections. You will also provide 5 comprehensive multiple-choice questions and answers (THE "answer" FIELD MUST CORRESSPOND TO THE LETTER OF THE CORRECT OPTION) based on the concepts in the transcription for each topic. The field "course_summary" means the "discipline" it is in. For example, the course "CS50" has "course_subject" = "Computer Science". You must format your output as a JSON file like so:
+const prompt = `You will receive a body of text which is the transcription of an educational video. You will summarize and condense key concepts into different sections based on the course name. You MUST generate at least 300 words for the course summary and NO LESS than 150 words. DO NOT provide more than 10 sections and you MUST generate at least 300 words for each section summary and NO LESS than 150 words. You will also provide 5 comprehensive multiple-choice questions and answers (THE "answer" FIELD MUST CORRESPOND TO THE LETTER OF THE CORRECT OPTION) based on the concepts in the transcription for each topic. The field "course_summary" means the "discipline" it is in. For example, the course "CS50" has "course_subject" = "Computer Science". You must format your output as a JSON file like so:
 
 (EXAMPLE)
 {
@@ -57,7 +57,7 @@ router.post('/course', getDataOfToken, async (req, res) => {
     //@ts-ignore
     const title = req.body.title;
     const link = req.body.link;
-    var transcription;
+    let transcription;
 
     // Obtain transcription from youtube video
     const result = await YoutubeTranscript.fetchTranscript(link);
@@ -139,7 +139,7 @@ router.post('/course', getDataOfToken, async (req, res) => {
 
 router.get('/courses/getIds', async (req, res) => {
   try {
-    const data = await db('courses').select('title', 'c_id');
+    const data = await db('courses').select('title', 'c_id', 'added_date', 'subject');
     res.status(200).send(data);
   } catch {
     console.error(Error);
@@ -169,24 +169,27 @@ interface Course {
     course_name: string;
     course_subject: string;
     course_summary: string;
-    sections: Section[]
+    sections: Section[],
+    link: string,
+    date: string
 }
 
 router.get('/courses/:c_id', async (req, res) => {
   try {
     const courseData = await db('courses as c')
-        .select('c.title', 'c.subject', 'c.c_text')
+        .select('c.title', 'c.subject', 'c.c_text', 'c.link', 'c.added_date')
         .where('c.c_id', '=', req.params.c_id);
     
     const sectionData = await db('sections as s')
         .select('s.s_id', 's.s_name', 's.s_text')
         .where('s.c_id', '=', req.params.c_id);
 
-    //@ts-ignore
     let courseJson: Course = {
         "course_name": courseData[0].title,
         "course_subject": courseData[0].subject,
         "course_summary": courseData[0].c_text,
+        "link": courseData[0].link,
+        "date" : courseData[0].added_date,
         "sections": []
     }
 

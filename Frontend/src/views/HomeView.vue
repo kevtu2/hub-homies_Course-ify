@@ -3,7 +3,7 @@ import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import ProgressSpinner from 'primevue/progressspinner';
-
+import { successToast } from '../modules/toastHelper';
 
 import { errorToast } from '../modules/toastHelper';
 import Cookies from 'js-cookie';
@@ -35,10 +35,12 @@ const submitTitle = async () => {
           authorization: Cookies.get('token'),
         },
       });
+      successToast("New Course Created!", "Your new course is ready to go!");
     } catch (error) {
       errorToast('Error', 'Error submitting link:' + error);
     }
   }
+  visible.value = false;
   loading.value = false;
 };
 
@@ -78,8 +80,9 @@ const loading = ref(false);
     :style="{ width: '25rem' }"
     class="flex content-center items-center"
   >
-    <ProgressSpinner v-if="loading" />
-
+    <div  class="h-40 w-40 flex content-center items-center" v-if="loading">
+      <ProgressSpinner />
+    </div>
     <div class="flex items-center gap-4 mb-4" v-if="!loading">
       <label for="course title" class="font-semibold w-24">Title</label>
       <InputText v-model="title" id="course title" class="flex-auto" autocomplete="off" />
