@@ -27,7 +27,7 @@
 
             <Accordion value="0">
               <AccordionPanel v-for="(question, index2) in section.questions" :key="index2" :value="index2">
-                <AccordionHeader>{{ "Q" + (index2 + 1) + ": " + question.question }}</AccordionHeader>
+                <AccordionHeader><span v-if="answerVisibility[index][index2]&&answerCorrectness[index][index2]" class="pi pi-check"></span><span v-else></span>{{ "Q" + (index2 + 1) + ": " + question.question }}</AccordionHeader>
                 <AccordionContent>
                   <div class="flex flex-col gap-4">
                     <div class="flex items-center gap-2">
@@ -68,6 +68,8 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { onMounted, ref, watch } from 'vue';
+
+import 'primeicons/primeicons.css';
 
 import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
