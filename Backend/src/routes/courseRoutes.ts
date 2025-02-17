@@ -239,10 +239,6 @@ router.get('/courses/:c_id', async (req, res) => {
         }
         courseJson.sections.push(sectionPart);
     }
-    
-    console.log(courseJson);
-
-
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: 'Internal server error.' });
