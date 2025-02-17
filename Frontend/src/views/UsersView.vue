@@ -46,7 +46,14 @@
                 </div>
               </template>
               <template #footer>
-                <Button icon="pi pi-share-alt" rounded variant="text" @click=copyCourse(course.c_id) />
+                <div class="flex items-center justify-between">
+                  <Button icon="pi pi-share-alt" rounded variant="text" @click=copyCourse(course.c_id) />
+                
+                  <div class="flex items-center gap-1">
+                    {{ course.likes }}
+                    <Button icon="pi pi-thumbs-up" rounded variant="text" />
+                  </div>
+                </div>
               </template>
             </Card>
           </div>
@@ -133,6 +140,7 @@ interface Course {
   added_date: string;
   subject: string;
   c_text: string;
+  likes: number;
   sections: { id: number; title: string }[];
 }
 
@@ -174,6 +182,9 @@ async function fetchData() {
     const coursesResponse = await axios.get('http://localhost:3000/api/courses/getIds');
     courses.value = coursesResponse.data;
 
+    for (let i = 0; i < courses.value.length; i++) {
+      courses.value[i].likes = Math.floor(Math.random() * 100);
+    }
     /*
     const sectionsResponse = await axios.get('http://localhost:3000/api/user/:u_id/section/:s_id');
     sections.value = sectionsResponse.data;
