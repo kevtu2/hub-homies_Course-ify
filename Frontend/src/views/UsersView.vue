@@ -14,15 +14,18 @@
           <div class="grid grid-cols-4 gap-4">
             <Card v-for="achievement in achievements" :key="achievement.u_id">
               <template #title>
-                {{ achievement.ach_name }}
+              {{ achievement.ach_name }}
                 <i class="pi pi-star"></i>
               </template>
               <template #content>
-                {{ achievement.ach_text }}
-              </template>
-            </Card>
-          </div>
-        </AccordionTab>
+              {{ achievement.ach_text }}
+              <div class="button-container"> 
+                <Button label="Share" icon="pi pi-share-alt" iconPos="right"/>
+              </div>
+            </template>
+          </Card>
+        </div>
+</AccordionTab>
         <AccordionTab header="Courses">
           <div class="grid grid-cols-4 gap-4">
             <Card v-for="course in courses" :key="course.c_id">
@@ -204,5 +207,16 @@ async function fetchSectionsForCourse(courseId) {
   font-size: 1.2rem;
   color: #333;
 }
+
+/* Adding margin to the div containing the button */
+.button-container {
+    margin-top: 10px;  /* Adjust as needed */
+}
+
+/* Or directly to the button for more control */
+.custom-button {
+    margin-top: 10px;  /* Adds space above the button */
+}
+
 </style>
 
