@@ -14,18 +14,21 @@
           <div class="grid grid-cols-4 gap-4">
             <Card v-for="achievement in achievements" :key="achievement.u_id">
               <template #title>
-              {{ achievement.ach_name }}
-                <i class="pi pi-star"></i>
+                <div class="flex items-center justify-between">
+                  <div>
+                    {{ achievement.ach_name }}
+                    <i class="pi pi-star"></i>
+                  </div>
+                  
+                <Button rounded icon="pi pi-share-alt" variant="text" />
+                </div>
               </template>
               <template #content>
               {{ achievement.ach_text }}
-              <div class="button-container"> 
-                <Button label="Share" icon="pi pi-share-alt" iconPos="right"/>
-              </div>
             </template>
           </Card>
         </div>
-</AccordionTab>
+        </AccordionTab>
         <AccordionTab header="Courses">
           <div class="grid grid-cols-4 gap-4">
             <Card v-for="course in courses" :key="course.c_id">
@@ -69,6 +72,7 @@
                   <Button 
                   icon="pi pi-plus" 
                   size="small" 
+                  variant="text"
                   rounded 
                   />
                 </div>
