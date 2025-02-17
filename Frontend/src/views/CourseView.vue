@@ -60,7 +60,16 @@
           </AccordionContent>
         </AccordionPanel>
       </Accordion>
+      
+      <div class="text-2xl mt-4">
+        Congratulations!
+      </div>
+      <div>
+        You've successfully completed {{ courseData?.course_name }}. Below is your cerficate in text!
+      </div>
+      <Textarea v-model="rewardText" class="w-full" style="resize: none" rows=10 >
 
+      </Textarea>
     </div>
   </div>
 </template>
@@ -78,9 +87,13 @@ import AccordionContent from 'primevue/accordioncontent';
 
 import Button from 'primevue/button';
 import RadioButton from 'primevue/radiobutton';
+import Textarea from 'primevue/textarea';
+import { successToast } from '../modules/toastHelper';
+import { useAuthStore } from '../stores/auth';
 
 import { useRoute } from 'vue-router';
 
+const authStore = useAuthStore();
 const route = useRoute();
 
 interface Course {
@@ -125,7 +138,35 @@ function getId(url : string) {
     : null;
 }
 
+const allRight = ref(false)
+const rewardText = ref('');
+
 const checkAnswer = (index: number, qIndex: number) => {
+  let temp = true
+  for(let i = 0; i < answerCorrectness.value.length; i++) {
+    if(temp == false) {
+      break;
+    }
+    for(let j = 0; j < answerCorrectness.value[i].length; j++) {
+      if(answerCorrectness.value[i][j] == false) {
+        temp = false;
+        break;
+      }
+    }
+  }
+  temp = true;
+  if(temp == true) {
+    rewardText.value = 
+              "Certificate of Achievement\n\n" +
+          "This certificate is presented to " + (authStore.isLoggedIn ? authStore.username : "Guest") + ". As members of the course-ify team, we proudly present to you your certification of completing the course " + (courseData.value ? courseData.value.course_name : 'NYLL') + " on " + new Date().toLocaleString() + ". We hope you strive for excellence in this field and for reach even greater heights.\n\n" +
+          "Sincerely\n\n" +
+          "The Course-ify team";
+    console.log(rewardText.value)
+    
+    allRight.value = true
+    successToast("Congratulations!", "You've completed " + courseData.value?.course_name + ". Scroll to the bottom to view your prize!")
+  }
+
   if (!courseData.value) {
     alert('Course data is not loaded');
     return;
