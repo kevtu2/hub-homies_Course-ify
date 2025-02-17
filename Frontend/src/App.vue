@@ -65,8 +65,10 @@ function addCourseToMenu(courseString: string, courseRoute: string) {
 onMounted(async () => {
   await tryStartupLogin();
   await getCourses();
+  usr_strk.value = 123;
 });
 
+const usr_strk = ref(0)
 const loginEmailInput = ref('');
 const loginPasswordInput = ref('');
 
@@ -187,8 +189,15 @@ const u_id = computed(() => authStore.u_id);
         </a>
       </template>
       <template #end>
-        <div v-if="isLoggedIn">
-          {{ username }}
+        <div v-if="isLoggedIn" class="flex items-center">
+          <div class="flex items-center gap-2">
+            {{ usr_strk }}
+            <i class="pi pi-calendar" />
+          </div>
+
+          <div class="ml-4">
+            {{ username }}
+          </div>
           <Button class="ml-2" @click="tryLogout" severity="secondary" icon="pi pi-sign-out" />
         </div>
         <div class="flex gap-2">
