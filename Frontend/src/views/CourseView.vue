@@ -171,14 +171,16 @@ const checkAnswer = async (index: number, qIndex: number) => {
   }
   temp = true;
   if(temp == true) {
-    rewardText.value = 
+      rewardText.value = 
               "Certificate of Achievement\n\n" +
           "This certificate is presented to " + (authStore.isLoggedIn ? authStore.username : "Guest") + ". As members of the course-ify team, we proudly present to you your certification of completing the course " + (courseData.value ? courseData.value.course_name : 'NYLL') + " on " + new Date().toLocaleString() + ". We hope you strive for excellence in this field and for reach even greater heights.\n\n" +
           "Sincerely,\n\n" +
           "The Course-ify team";
     
-    allRight.value = true
-    successToast("Congratulations!", "You've completed " + courseData.value?.course_name + ". Scroll to the bottom to view your prize!")
+    if(!allRight.value) {
+      allRight.value = true
+      successToast("Congratulations!", "You've completed " + courseData.value?.course_name + ". Scroll to the bottom to view your prize!")
+    }
   }
 
   if (!courseData.value) {
@@ -214,6 +216,7 @@ watch(courseData, (newVal) => {
 });
 
 async function getCourseData(c_id : number) {
+  allRight.value = false;
   try {
     const response = await axios.get('http://localhost:3000/api/courses/' + c_id);
     courseData.value = response.data;
