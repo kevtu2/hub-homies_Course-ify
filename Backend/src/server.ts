@@ -6,6 +6,8 @@ import courseRoutes from './routes/courseRoutes';
 import questionRoutes from './routes/questionRoutes';
 import sectionRoutes from './routes/sectionRoutes';
 import followRoutes from './routes/followRoutes';
+import userRoutes from './routes/userRoutes';
+import achievementRoutes from './routes/achievementRoutes';
 
 import cors from 'cors';
 import { setupDatabase } from './database/dbSetup';
@@ -40,6 +42,10 @@ app.use('/api', questionRoutes);
 app.use('/api', sectionRoutes);
 
 app.use('/api', followRoutes);
+
+app.use('/api', userRoutes);
+
+app.use('/api', achievementRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
