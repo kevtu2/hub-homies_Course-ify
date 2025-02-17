@@ -1,9 +1,18 @@
 <template>
   <div class="flex justify-center bg-gray-100 grow">
     <div class="p-6 w-full max-w-screen-xl mx-auto bg-white shadow-lg border border-gray-200">
-      <h1 class="fancy-text">
-        {{ courseData?.course_name }}
-      </h1>
+      <div class="flex justify-between">
+        <h1 class="fancy-text">
+          {{ courseData?.course_name }}
+        </h1>
+
+        <div>
+          <Button class="mr-4" icon="pi pi-share-alt" variant=text rounded />
+
+          {{ Math.floor(Math.random() * 100) }}
+          <Button icon="pi pi-thumbs-up" variant=text rounded />
+        </div>
+      </div>
 
       <div class="text-lg mb-1">
         {{ courseData?.course_subject ? courseData.course_subject + " | " + (courseData.date ? new Date(courseData.date).toLocaleDateString() : '') : '' }}
@@ -89,7 +98,6 @@ import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
 import AccordionHeader from 'primevue/accordionheader';
 import AccordionContent from 'primevue/accordioncontent';
-
 import Button from 'primevue/button';
 import RadioButton from 'primevue/radiobutton';
 import Textarea from 'primevue/textarea';
