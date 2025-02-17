@@ -10,7 +10,7 @@
       </div>
 
       <Accordion :multiple="true">
-        <AccordionTab header="Achievements">
+        <AccordionTab header="Achievements" >
           <div class="grid grid-cols-4 gap-4">
             <Card v-for="achievement in achievements" :key="achievement.u_id">
               <template #title>
@@ -82,9 +82,9 @@ const authStore = useAuthStore();
 const isLoggedIn = computed(() => authStore.isLoggedIn)
 const profileNameText = computed(() => {
   if(isLoggedIn.value) {
-    return authStore.username + "'s Profile";
+    return authStore.username + "'s Dashboard";
   } else {
-    return 'Profile';
+    return "Guest's Dashboard";
   }
 })
 
@@ -143,7 +143,6 @@ async function fetchData() {
     */
     const usersResponse = await axios.get('http://localhost:3000/api/users/publicData');
     users.value = usersResponse.data;
-    console.log(users.value);
 
     const achievementsResponse = await axios.get('http://localhost:3000/api/achievements', {
       headers: {
