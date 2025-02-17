@@ -114,87 +114,15 @@ const courseData = ref<CourseData>({
   course_summary: '',
   sections: [],
 });
-// const courseData = ref({
 
-//   "course_name": "COURSE_NAME",
-//   "course_summary": "COURSE_SUMMARY",
-//   "sections": [
-//     {
-//       "section": "SECTION_NAME",
-//       "summary": "SECTION_SUMMARY",
-//       "questions": [
-//         {
-//           "question": "QUESTION",
-//           "answer": "4",
-//           "a": "OPTION1",
-//           "b": "OPTION2",
-//           "c": "OPTION3",
-//           "d": "OPTION4"
-//         },
-//         {
-//           "question": "QUESTION",
-//           "answer": "1",
-//           "a": "OPTION1",
-//           "b": "OPTION2",
-//           "c": "OPTION3",
-//           "d": "OPTION4"
-//         }
-//       ]
-//     },
-//     {
-//       "section": "SECTION_NAME",
-//       "summary": "SECTION_SUMMARY",
-//       "questions": [
-//         {
-//           "question": "QUESTION",
-//           "answer": "2",
-//           "a": "OPTION1",
-//           "b": "OPTION2",
-//           "c": "OPTION3",
-//           "d": "OPTION4"
-//         },
-//         {
-//           "question": "QUESTION",
-//           "answer": "3",
-//           "a": "OPTION1",
-//           "b": "OPTION2",
-//           "c": "OPTION3",
-//           "d": "OPTION4"
-//         }
-//       ]
-//     },
-//     {
-//       "section": "SECTION_NAME",
-//       "summary": "SECTION_SUMMARY",
-//       "questions": [
-//         {
-//           "question": "QUESTION",
-//           "answer": "2",
-//           "a": "OPTION1",
-//           "b": "OPTION2",
-//           "c": "OPTION3",
-//           "d": "OPTION4"
-//         },
-//         {
-//           "question": "QUESTION",
-//           "answer": "3",
-//           "a": "OPTION1",
-//           "b": "OPTION2",
-//           "c": "OPTION3",
-//           "d": "OPTION4"
-//         }
-//       ]
-//     }
-//   ]
-// })
 
 const mapAnswer: {
   [key: string]: string;
 } = {
-  '1': 'A',
-  '2': 'B',
-  '3': 'C',
-  '4': 'D',
+  1: 'A',
+  2: 'B',
+  3: 'C',
+  4: 'D',
   'A': 'A',
   'B': 'B',
   'C': 'C',
@@ -219,9 +147,9 @@ const checkAnswerRoutine = (index: number, qIndex: number) => {
       const realAnswer = mapAnswer[courseData.value.sections[index].questions[qIndex].answer];
       const proposedAnswer = mapAnswer[selectedAnswer.value[index][qIndex]];
       if (!Object.keys(mapAnswer).includes(realAnswer)) {
-        alert('BUG: There is no valid answer for this question');
+        alert('BUG: There is no valid answer for this question.');
         console.log("proposed invalid answer: ", realAnswer)
-        return;
+        return
       }
       console.log("const proposedAnswer: ",proposedAnswer," const answerCorrectness: ",answerCorrectness.value[index]);
       if (proposedAnswer !== undefined) {
