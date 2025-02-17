@@ -73,7 +73,6 @@ import AccordionContent from 'primevue/accordioncontent';
 import { Form } from '@primevue/forms';
 import Button from 'primevue/button';
 import RadioButton from 'primevue/radiobutton';
-import RadioButtonGroup from 'primevue/radiobuttongroup';
 
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
@@ -144,10 +143,14 @@ const courseData = ref({
 const mapAnswer: {
   [key: string]: string;
 } = {
-  '1': 'A',
-  '2': 'B',
-  '3': 'C',
-  '4': 'D'
+  1: 'A',
+  2: 'B',
+  3: 'C',
+  4: 'D',
+  'A': 'A',
+  'B': 'B',
+  'C': 'C',
+  'D': 'D',
 }
 
 const visibleAnswers = ref(courseData.value.sections.map(section => section.questions.map(() => false)));
@@ -159,11 +162,11 @@ const checkAnswerRoutine = (index: number, qIndex: number) => {
       const propsedAnswer = selectedAnswer.value[index][qIndex];
       if (!Object.keys(mapAnswer).includes(realAnswer)) {
         alert('BUG: There is no valid answer for this question');
-        console.log("proposed invalid answer: ",realAnswer)
+        console.log("proposed invalid answer: ", realAnswer)
         return;
       }
       if (selectedAnswer.value !== null) {
-        if (propsedAnswer == realAnswer) {
+        if (mapAnswer[propsedAnswer] == realAnswer) {
           answerCorrectness.value[index][qIndex] = true;
         } else {
           answerCorrectness.value[index][qIndex] = false;
@@ -190,7 +193,7 @@ async function getCourseData(c_id : Number) {
   try {
     const response = await axios.get('http://localhost:3000/api/courses/' + c_id);
     courseData.value = response.data;
-    console.log(courseData.value);
+    console.log("Course data: ",courseData.value);
   } catch (error) {
     console.error('Error: ', error);
   }
