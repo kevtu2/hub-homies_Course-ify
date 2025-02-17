@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center bg-gray-100">
+  <div class="flex justify-center bg-gray-100 grow">
     <div class="p-6 w-full max-w-screen-xl mx-auto bg-white shadow-lg border border-gray-200">
       <h1 class="fancy-text">
         {{ courseData?.course_name }}
@@ -50,7 +50,7 @@
                   <!-- <Button class="mt-4" label="Submit" size="small" v-if="!answerCorrectness[index][index2]" @click="checkAnswer(index, index2)" /> -->
                   <Button class="w-40 m-8" type="submit" severity="secondary" label="Submit" v-if="!answerVisibility[index][index2]" @click="checkAnswer(index,index2)" />
                   <Button v-if="answerVisibility[index][index2]" class="w-40 m-8" type="button" severity="secondary" label="Clear the answer" @click="clearAnswer(index,index2)" />
-                  <p v-if="answerVisibility[index][index2]&&!answerCorrectness[index][index2]" class="text-xl mt-5 mb-5">Incorret. Reference Answer: {{ question.answer }}</p>
+                  <p v-if="answerVisibility[index][index2]&&!answerCorrectness[index][index2]" class="text-xl mt-5 mb-5">Incorrect. Reference Answer: {{ question.answer }}</p>
                   <p v-if="answerVisibility[index][index2]&&answerCorrectness[index][index2]" class="text-xl mt-5 mb-5">You are Correct!</p>
                   
                 </AccordionContent>
@@ -61,15 +61,20 @@
         </AccordionPanel>
       </Accordion>
       
-      <div class="text-2xl mt-4">
-        Congratulations!
-      </div>
-      <div>
-        You've successfully completed {{ courseData?.course_name }}. Below is your cerficate in text!
-      </div>
-      <Textarea v-model="rewardText" class="w-full" style="resize: none" rows=10 >
 
-      </Textarea>
+      <iframe v-if="pdfCert" :src="pdfCert" width="100%" height="600px"></iframe>
+
+      <div class="w-full" v-if=allRight>
+        <div class="text-2xl mt-4">
+          Congratulations!
+        </div>
+        <div>
+          You've successfully completed {{ courseData?.course_name }}. Below is your cerficate in text!
+        </div>
+        <Textarea v-model="rewardText" class="w-full" style="resize: none" rows=10 >
+
+        </Textarea>
+      </div>
     </div>
   </div>
 </template>
@@ -95,6 +100,8 @@ import { useRoute } from 'vue-router';
 
 const authStore = useAuthStore();
 const route = useRoute();
+
+const pdfCert = ref('');
 
 interface Course {
   course_name: string;
@@ -141,7 +148,7 @@ function getId(url : string) {
 const allRight = ref(false)
 const rewardText = ref('');
 
-const checkAnswer = (index: number, qIndex: number) => {
+const checkAnswer = async (index: number, qIndex: number) => {
   let temp = true
   for(let i = 0; i < answerCorrectness.value.length; i++) {
     if(temp == false) {
@@ -159,9 +166,8 @@ const checkAnswer = (index: number, qIndex: number) => {
     rewardText.value = 
               "Certificate of Achievement\n\n" +
           "This certificate is presented to " + (authStore.isLoggedIn ? authStore.username : "Guest") + ". As members of the course-ify team, we proudly present to you your certification of completing the course " + (courseData.value ? courseData.value.course_name : 'NYLL') + " on " + new Date().toLocaleString() + ". We hope you strive for excellence in this field and for reach even greater heights.\n\n" +
-          "Sincerely\n\n" +
+          "Sincerely,\n\n" +
           "The Course-ify team";
-    console.log(rewardText.value)
     
     allRight.value = true
     successToast("Congratulations!", "You've completed " + courseData.value?.course_name + ". Scroll to the bottom to view your prize!")
@@ -206,7 +212,21 @@ async function getCourseData(c_id : number) {
   } catch (error) {
     console.error('Error: ', error);
   }
+
+  /*
+  try {
+    const result = await axios.get('http://localhost:3000/api/courses/cert/' + c_id, {
+      responseType: 'blob'
+    })
+    const pdfBlob = result.data;
+    pdfCert.value =  URL.createObjectURL(pdfBlob);
+    console.log(pdfCert.value)
+  } catch (error) {
+    console.error('PDF Error: ' + error)
+  }
+    */
 }
+
 
 onMounted(async () => {
   await getCourseData(Number(route.params.id));

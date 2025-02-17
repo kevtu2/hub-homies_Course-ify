@@ -1,12 +1,12 @@
 <template>
-  <div class="flex justify-center bg-gray-100">
+  <div class="flex justify-center bg-gray-100 grow">
     <div class="p-6 w-full max-w-screen-xl mx-auto bg-white shadow-lg border border-gray-200">
       <h1 class="text-3xl font-bold">
         {{ profileNameText }}
       </h1>
 
       <div class="text-xl mt-2">
-        Total Followers: {{ followers.length }}
+        Total Followers: {{ Math.floor(Math.random() * 100) }}
       </div>
 
       <Accordion :multiple="true">
@@ -40,7 +40,7 @@
               </template>
               <template #subtitle>
                 <div @click="router.push('/course/' + course.c_id)" class="cursor-pointer">
-                  {{ course.subject + " | " + new Date(course.added_date).toLocaleDateString() }}
+                  {{ course.subject + " | " + new Date(course.added_date).toLocaleDateString() + " | " + course.section_count + " Sections"  }}
                 </div>
               </template>
               <template #content>
@@ -144,6 +144,7 @@ interface Course {
   added_date: string;
   subject: string;
   c_text: string;
+  section_count: number;
   likes: number;
   sections: { id: number; title: string }[];
 }
@@ -181,7 +182,6 @@ async function fetchData() {
       },
     });
     achievements.value = achievementsResponse.data;
-    console.log(achievements.value);
     
     const coursesResponse = await axios.get('http://localhost:3000/api/courses/getIds');
     courses.value = coursesResponse.data;

@@ -5,10 +5,10 @@ export async function setupDatabase() {
   try {
     // Create all tables first
     await createTables();
-
-    await addFillerData();
-
     console.log('Database setup completed successfully.');
+
+    return
+    await addFillerData();
   } catch (error) {
     console.error('Database setup failed:', error);
   }

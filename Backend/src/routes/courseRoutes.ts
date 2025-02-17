@@ -6,6 +6,7 @@ import config from '../modules/dots';
 import { getDataOfToken } from '../middleware/tokenCheckerMiddleware';
 import { YoutubeTranscript } from 'youtube-transcript';
 import { addCourseOutputToDatabase } from '../modules/dbAddHelper';
+//import puppeteer from 'puppeteer';
 
 const router = Router();
 const openai = new OpenAI({ apiKey: config.OPENAI_API_KEY });
@@ -139,7 +140,17 @@ router.post('/course', getDataOfToken, async (req, res) => {
 
 router.get('/courses/getIds', async (req, res) => {
   try {
-    const data = await db('courses').select('title', 'c_id', 'added_date', 'subject', 'c_text');
+    const data = await db('courses')
+    .select(
+      'title',
+      'c_id',
+      'added_date',
+      'subject',
+      'c_text',
+      db.raw('(SELECT COUNT(*) FROM sections WHERE sections.c_id = courses.c_id) as section_count')
+    );
+    
+
     res.status(200).send(data);
   } catch {
     console.error(Error);
@@ -173,6 +184,42 @@ interface Course {
     link: string,
     date: string
 }
+
+/*
+router.get('/courses/cert/:c_id', async (req, res) => {
+  try {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto('https://news.ycombinator.com', {
+      waitUntil: 'networkidle2',
+    });
+
+    await page.setContent(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Certificate</title>
+        </head>
+        <body>
+          <h1>Certificate for Course ID: ${req.params.c_id}</h1>
+          <p>This is a certificate for your course completion!</p>
+        </body>
+      </html>
+    `);
+
+    const pdfBuffer = await page.pdf({ format: 'A4' });
+
+    res.setHeader('Content-Type', 'application/pdf');
+
+    res.status(200).send(pdfBuffer);
+
+    await browser.close();
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).send("Error generating PDF.");
+  }
+});
+*/
 
 router.get('/courses/:c_id', async (req, res) => {
   try {
