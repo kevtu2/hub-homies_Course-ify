@@ -4,6 +4,17 @@
       <h1 class="fancy-text">
         {{ courseData?.course_name }}
       </h1>
+
+      <div class="text-lg mb-1">
+        {{ courseData?.course_subject ? courseData.course_subject + " | " + (courseData.date ? new Date(courseData.date).toLocaleDateString() : '') : '' }}
+      </div>
+
+      <div>
+        <iframe width="600" height="315"
+          :src="'https://www.youtube.com/embed/' + (courseData?.link ? getId(courseData.link) : '')">
+        </iframe>
+      </div>
+
       <p class="mt-4 text-gray-800">
         {{ courseData?.course_summary }}
       </p>
@@ -73,6 +84,9 @@ const route = useRoute();
 interface Course {
   course_name: string;
   course_summary: string;
+  link: string;
+  course_subject: string;
+  date: string;
   sections: {
     section: string;
     summary: string;
@@ -100,6 +114,15 @@ const answerToDigitMap: { [key: string]: number } = {
   "D": 4,
 };
 
+function getId(url : string) {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+  const match = url.match(regExp);
+
+  return (match && match[2].length === 11)
+    ? match[2]
+    : null;
+}
+
 const checkAnswer = (index: number, qIndex: number) => {
   if (!courseData.value) {
     alert('Course data is not loaded');
@@ -116,7 +139,6 @@ const checkAnswer = (index: number, qIndex: number) => {
     }
   } else {
     alert('Please select an option!');
-    console.log("The selectedAnswer variable answer: ", selectedAnswers.value[index][qIndex])
   }
 };
 
