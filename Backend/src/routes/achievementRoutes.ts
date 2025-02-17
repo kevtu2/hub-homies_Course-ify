@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getDataOfToken } from '../middleware/tokenCheckerMiddleware';
+import { getDataOfToken, getDataOfTokenIfAvailable } from '../middleware/tokenCheckerMiddleware';
 import { db } from '../database/db';
 
 const router = Router();
@@ -19,12 +19,20 @@ router.get('/achievements/achievedAchievements', getDataOfToken, async (req, res
     }
 });
 
-router.get('/achievements', async (req, res) => {
+router.get('/achievements', getDataOfTokenIfAvailable, async (req, res) => {
     try {
-        const data = await db('achievements')
-            .select('*');
-
-        res.status(200).send(data);
+        if(res.locals.u_id) {
+            const data = await db('achievements as a')
+                .leftJoin('has_achievement as ha', 'a.ach_id', '=', 'ha.ach_id')
+                .leftJoin('users as u', 'ha.u_id', '=', 'u.u_id')
+                .where('u.u_id', Number(res.locals.u_id))
+                .select('a.ach_id', 'a.ach_name', 'a.ach_text');
+            res.status(200).send(data);
+        } else {
+            const data = await db('achievements')
+                .select('ach_id', 'ach_name', 'ach_text');
+            res.status(200).send(data);
+        }
     } catch (error) {
         res.status(500).send({ message: 'Internal Server Error' });
     }

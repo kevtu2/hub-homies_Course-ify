@@ -7,30 +7,49 @@
         Total Followers: {{ followers.length }}
       </div>
 
-      <Accordion>
-        <!-- Dynamic Accordion for Each Category -->
-        <AccordionTab header="Followers">
-          <ul>
-            <li v-for="follower in followers" :key="follower.f_id">{{ follower.flwer }}</li>
-          </ul>
-        </AccordionTab>
-
+      <Accordion :multiple="true">
         <AccordionTab header="Achievements">
-          <ul>
-            <li v-for="achievement in achievements" :key="achievement.u_id">{{ achievement.ach_name }}</li>
-          </ul>
+          <div class="grid grid-cols-4 gap-4">
+            <Card v-for="achievement in achievements" :key="achievement.u_id">
+              <template #title>
+                {{ achievement.ach_name }}
+                <i class="pi pi-star"></i>
+              </template>
+              <template #content>
+                {{ achievement.ach_text }}
+              </template>
+            </Card>
+          </div>
         </AccordionTab>
-
-        <AccordionTab header="Sections">
-          <ul><li v-for="section in sections" :key="section.s_id">{{ section.s_name }}</li></ul>
+        <AccordionTab header="Courses">
+          <div class="grid grid-cols-4 gap-4">
+            <Card v-for="course in courses" :key="course.c_id" @click="router.push('/course/' + course.c_id)" class="cursor-pointer">
+              <template #title>
+                {{ course.title }}
+                <i class="pi pi-book"></i>
+              </template>
+              <template #subtitle>
+                {{ course.subject + " | " + new Date(course.added_date).toLocaleDateString() }}
+              </template>
+              <template #content>
+                <div class="overflow-auto max-h-40">
+                  {{ course.c_text }}
+                </div>
+              </template>
+            </Card>
+          </div>
         </AccordionTab>
-      </Accordion>
-
-      <Accordion v-if="selectedCourseSections.length > 0">
-        <AccordionTab header="Sections">
-          <ul>
-            <li v-for="section in selectedCourseSections" :key="section.id">{{ section.title }}</li>
-          </ul>
+        <AccordionTab header="Users">
+          <div class="grid grid-cols-6 gap-4">
+            <Card v-for="user in users" :key="user.u_id" class="cursor-pointer">
+              <template #subtitle>
+                <div class="font-bold">
+                  {{ user.name }}
+                  <i class="pi pi-user"></i>
+                </div>
+              </template>
+            </Card>
+          </div>
         </AccordionTab>
       </Accordion>
     </div>
@@ -41,28 +60,43 @@
 import { ref, computed, onMounted } from 'vue';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
+import Card from 'primevue/card';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import { useAuthStore } from '../stores/auth';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const authStore = useAuthStore();
 
 interface Follower {
   f_id: number;
   flwer: string;
+  ach_text: string;
 }
 
 const followers = ref<Follower[]>([]);
 interface Achievement {
   u_id: number;
   ach_name: string;
+  ach_text: string;
+}
+
+const users = ref<User[]>([]);
+interface User {
+  u_id: number;
+  name: string;
 }
 
 const achievements = ref<Achievement[]>([]);
 interface Course {
   c_id: number;
   title: string;
+  added_date: string;
+  subject: string;
+  c_text: string;
   sections: { id: number; title: string }[];
 }
 
@@ -81,23 +115,29 @@ interface Section {
 const sections = ref<Section[]>([]);
 async function fetchData() {
   try {
+    /*
     const followersResponse = await axios.get('http://localhost:3000/api/followers/' + authStore.u_id, {
       headers: {
         authorization: Cookies.get('token'),
       },
     });
     followers.value = followersResponse.data;
+    console.log(followers.value);
+    */
+    const usersResponse = await axios.get('http://localhost:3000/api/users/publicData');
+    users.value = usersResponse.data;
+    console.log(users.value);
 
-    const achievementsResponse = await axios.get('http://localhost:3000/api/achievements/achievedachievements', {
+    const achievementsResponse = await axios.get('http://localhost:3000/api/achievements', {
       headers: {
         authorization: Cookies.get('token'),
       },
     });
     achievements.value = achievementsResponse.data;
     
+    
     const coursesResponse = await axios.get('http://localhost:3000/api/courses/getIds');
     courses.value = coursesResponse.data;
-    console.log(courses.value);
 
     /*
     const sectionsResponse = await axios.get('http://localhost:3000/api/user/:u_id/section/:s_id');
