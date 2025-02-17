@@ -139,7 +139,7 @@ router.post('/course', getDataOfToken, async (req, res) => {
 
 router.get('/courses/getIds', async (req, res) => {
   try {
-    const data = await db('courses').select('title', 'c_id');
+    const data = await db('courses').select('title', 'c_id', 'added_date', 'subject');
     res.status(200).send(data);
   } catch {
     console.error(Error);
