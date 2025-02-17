@@ -4,7 +4,7 @@ import { db } from '../database/db';
 
 const router = Router();
 
-router.get('/achievedAchievements', getDataOfToken, async (req, res) => {
+router.get('/achievements/achievedAchievements', getDataOfToken, async (req, res) => {
     try {
         const data = await db('users as u')
             .leftJoin('has_achievement as ha', 'u.u_id', '=', 'ha.u_id')
