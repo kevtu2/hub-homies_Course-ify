@@ -7,13 +7,14 @@ const router = Router();
 router.get('/achievements/achievedAchievements', getDataOfToken, async (req, res) => {
     try {
         const data = await db('users as u')
-            .leftJoin('has_achievement as ha', 'u.u_id', '=', 'ha.u_id')
-            .leftJoin('achievements as a', 'ha.a_id', '=', 'a.a_id')
-            .where('u.u_id', res.locals.u_id)
-            .select('a.*');
+            .join('has_achievement as ha', 'u.u_id', '=', 'ha.u_id')
+            .join('achievements as a', 'ha.ach_id', '=', 'a.ach_id')
+            .where('u.u_id', Number(res.locals.u_id))
+            .select('a.ach_id', 'a.ach_name', 'a.ach_text');
 
         res.status(200).send(data);
     } catch (error) {
+        console.log(error);
         res.status(500).send({ message: 'Internal Server Error' });
     }
 });

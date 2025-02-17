@@ -3,7 +3,6 @@
     <div class="p-6 w-full max-w-screen-xl mx-auto bg-white shadow-lg border border-gray-200">
       <h1 class="fancy-text">User Profile</h1>
 
-      <!-- Display Follower Count -->
       <div class="follower-count">
         Total Followers: {{ followers.length }}
       </div>
@@ -24,7 +23,7 @@
 
         <AccordionTab header="Sections">
           <ul><li v-for="section in sections" :key="section.s_id">{{ section.s_name }}</li></ul>
-</AccordionTab>
+        </AccordionTab>
       </Accordion>
 
       <Accordion v-if="selectedCourseSections.length > 0">
@@ -43,6 +42,11 @@ import { ref, computed, onMounted } from 'vue';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import axios from 'axios';
+import Cookies from 'js-cookie';
+
+import { useAuthStore } from '../stores/auth';
+
+const authStore = useAuthStore();
 
 interface Follower {
   f_id: number;
@@ -77,26 +81,39 @@ interface Section {
 const sections = ref<Section[]>([]);
 async function fetchData() {
   try {
-    const [followersResponse, achievementsResponse, coursesResponse, sectionsResponse] = await Promise.all([
-      axios.get('/follows/followUsers'),
-      axios.get('/achievements/acheived/getAchievements'),
-      axios.get('/courses/getIds'),
-      axios.get('/user/:u_id/section/:s_id')
-    ]);
+    const followersResponse = await axios.get('http://localhost:3000/api/followers/' + authStore.u_id, {
+      headers: {
+        authorization: Cookies.get('token'),
+      },
+    });
     followers.value = followersResponse.data;
+
+    const achievementsResponse = await axios.get('http://localhost:3000/api/achievements/achievedachievements', {
+      headers: {
+        authorization: Cookies.get('token'),
+      },
+    });
     achievements.value = achievementsResponse.data;
+    
+    const coursesResponse = await axios.get('http://localhost:3000/api/courses/getIds');
     courses.value = coursesResponse.data;
-    sections.value = sectionsResponse.data; // Assume sections is a reactive ref() initialized in your setup()
+    console.log(courses.value);
+
+    /*
+    const sectionsResponse = await axios.get('http://localhost:3000/api/user/:u_id/section/:s_id');
+    sections.value = sectionsResponse.data;
+    */
   } catch (error) {
     console.error('Failed to fetch data:', error);
   }
 }
 
 
+onMounted(async () => {
+  await fetchData();
+})
 
-
-onMounted(fetchData);
-
+/*
 async function fetchSectionsForCourse(courseId) {
   try {
     const response = await axios.get(`/api/sections?courseId=${courseId}`);
@@ -105,6 +122,7 @@ async function fetchSectionsForCourse(courseId) {
     console.error('Failed to fetch sections:', error);
   }
 }
+*/
 </script>
 
 <style scoped>
