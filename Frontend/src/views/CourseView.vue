@@ -18,7 +18,7 @@
               <Accordion :value="['1']" multiple>
                 <AccordionPanel :value="qIndex" v-for="(question, qIndex) in section.questions" :key="qIndex">
                   <AccordionHeader>
-                    Question #{{ qIndex }}
+                    Question #{{ qIndex+1 }}
                   </AccordionHeader>
                   <AccordionContent>
                     <p class="mt-8 mb-8">{{ question.question }}</p>
@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 
 import Accordion from 'primevue/accordion';
 import AccordionPanel from 'primevue/accordionpanel';
@@ -88,57 +88,105 @@ const id = computed(async () => {
   return route.params.id;
 });
 
-const courseData = ref({
+interface Question {
+  question: string;
+  answer: string;  // Assuming the answer is stored as a string (e.g., the index of the correct option)
+  a: string;
+  b: string;
+  c: string;
+  d: string;
+}
 
-  "course_name": "COURSE_NAME",
-  "course_summary": "COURSE_SUMMARY",
-  "sections": [
-    {
-      "section": "SECTION_NAME",
-      "summary": "SECTION_SUMMARY",
-      "questions": [
-        {
-          "question": "QUESTION",
-          "answer": "4",
-          "a": "OPTION1",
-          "b": "OPTION2",
-          "c": "OPTION3",
-          "d": "OPTION4"
-        },
-        {
-          "question": "QUESTION",
-          "answer": "1",
-          "a": "OPTION1",
-          "b": "OPTION2",
-          "c": "OPTION3",
-          "d": "OPTION4"
-        }
-      ]
-    },
-    {
-      "section": "SECTION_NAME",
-      "summary": "SECTION_SUMMARY",
-      "questions": [
-        {
-          "question": "QUESTION",
-          "answer": "2",
-          "a": "OPTION1",
-          "b": "OPTION2",
-          "c": "OPTION3",
-          "d": "OPTION4"
-        },
-        {
-          "question": "QUESTION",
-          "answer": "3",
-          "a": "OPTION1",
-          "b": "OPTION2",
-          "c": "OPTION3",
-          "d": "OPTION4"
-        }
-      ]
-    }
-  ]
-})
+interface Section {
+  section: string;
+  summary: string;
+  questions: Question[];
+}
+
+interface CourseData {
+  course_name: string;
+  course_summary: string;
+  sections: Section[];
+}
+
+const courseData = ref<CourseData>({
+  course_name: '',
+  course_summary: '',
+  sections: [],
+});
+// const courseData = ref({
+
+//   "course_name": "COURSE_NAME",
+//   "course_summary": "COURSE_SUMMARY",
+//   "sections": [
+//     {
+//       "section": "SECTION_NAME",
+//       "summary": "SECTION_SUMMARY",
+//       "questions": [
+//         {
+//           "question": "QUESTION",
+//           "answer": "4",
+//           "a": "OPTION1",
+//           "b": "OPTION2",
+//           "c": "OPTION3",
+//           "d": "OPTION4"
+//         },
+//         {
+//           "question": "QUESTION",
+//           "answer": "1",
+//           "a": "OPTION1",
+//           "b": "OPTION2",
+//           "c": "OPTION3",
+//           "d": "OPTION4"
+//         }
+//       ]
+//     },
+//     {
+//       "section": "SECTION_NAME",
+//       "summary": "SECTION_SUMMARY",
+//       "questions": [
+//         {
+//           "question": "QUESTION",
+//           "answer": "2",
+//           "a": "OPTION1",
+//           "b": "OPTION2",
+//           "c": "OPTION3",
+//           "d": "OPTION4"
+//         },
+//         {
+//           "question": "QUESTION",
+//           "answer": "3",
+//           "a": "OPTION1",
+//           "b": "OPTION2",
+//           "c": "OPTION3",
+//           "d": "OPTION4"
+//         }
+//       ]
+//     },
+//     {
+//       "section": "SECTION_NAME",
+//       "summary": "SECTION_SUMMARY",
+//       "questions": [
+//         {
+//           "question": "QUESTION",
+//           "answer": "2",
+//           "a": "OPTION1",
+//           "b": "OPTION2",
+//           "c": "OPTION3",
+//           "d": "OPTION4"
+//         },
+//         {
+//           "question": "QUESTION",
+//           "answer": "3",
+//           "a": "OPTION1",
+//           "b": "OPTION2",
+//           "c": "OPTION3",
+//           "d": "OPTION4"
+//         }
+//       ]
+//     }
+//   ]
+// })
 
 const mapAnswer: {
   [key: string]: string;
@@ -153,20 +201,31 @@ const mapAnswer: {
   'D': 'D',
 }
 
-const visibleAnswers = ref(courseData.value.sections.map(section => section.questions.map(() => false)));
-const answerCorrectness = ref(courseData.value.sections.map(section => section.questions.map(() => true)));
-const selectedAnswer = ref(courseData.value.sections.map(section => section.questions.map(() => '')));
+async function getCourseData(c_id : Number) {
+  try {
+    const response = await axios.get('http://localhost:3000/api/courses/' + c_id);
+    courseData.value = response.data;
+  } catch (error) {
+    console.error('Error: ', error);
+  }
+}
+
+const visibleAnswers = ref<boolean[][]>(courseData.value.sections.map((section:Section) => section.questions.map(() => false)));
+const answerCorrectness = ref<boolean[][]>(courseData.value.sections.map((section:Section) => section.questions.map(() => true)));
+const selectedAnswer = ref<string[][]>(courseData.value.sections.map((section:Section) => section.questions.map(() => '')));
+console.log("visibleAnswers: ",visibleAnswers.value, "courseData: ",courseData.value);
 
 const checkAnswerRoutine = (index: number, qIndex: number) => {
-      const realAnswer = courseData.value.sections[index].questions[qIndex].answer;
-      const propsedAnswer = selectedAnswer.value[index][qIndex];
+      const realAnswer = mapAnswer[courseData.value.sections[index].questions[qIndex].answer];
+      const proposedAnswer = mapAnswer[selectedAnswer.value[index][qIndex]];
       if (!Object.keys(mapAnswer).includes(realAnswer)) {
         alert('BUG: There is no valid answer for this question');
         console.log("proposed invalid answer: ", realAnswer)
         return;
       }
-      if (selectedAnswer.value !== null) {
-        if (propsedAnswer == realAnswer) {
+      console.log("const proposedAnswer: ",proposedAnswer," const answerCorrectness: ",answerCorrectness.value[index]);
+      if (proposedAnswer !== undefined) {
+        if (proposedAnswer == realAnswer) {
           answerCorrectness.value[index][qIndex] = true;
         } else {
           answerCorrectness.value[index][qIndex] = false;
@@ -174,7 +233,8 @@ const checkAnswerRoutine = (index: number, qIndex: number) => {
         console.log("Answer correctness determination: ",answerCorrectness.value[index][qIndex],"Real answer: ", realAnswer, ", selected answer: ",selectedAnswer.value[index][qIndex]);
       } else {
         alert('Please select an option!');
-        console.log("The selectedAnswer variable answer: ",selectedAnswer.value[index][qIndex])
+        console.log("The selectedAnswer variable answer: ",selectedAnswer.value[index][qIndex]);
+        return;
       }
       toggleVisibility(index,qIndex);
     };
@@ -187,16 +247,6 @@ const clearAnswerRoutine = (index: number, qIndex: number) => {
 
 const toggleVisibility = async (index: number,qIndex: number) => {
   visibleAnswers.value[index][qIndex] = !visibleAnswers.value[index][qIndex];
-}
-
-async function getCourseData(c_id : Number) {
-  try {
-    const response = await axios.get('http://localhost:3000/api/courses/' + c_id);
-    courseData.value = response.data;
-    console.log("Course data: ",courseData.value);
-  } catch (error) {
-    console.error('Error: ', error);
-  }
 }
 </script>
 
