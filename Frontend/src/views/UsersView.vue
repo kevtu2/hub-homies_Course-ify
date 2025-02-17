@@ -79,7 +79,7 @@ async function fetchData() {
   try {
     const [followersResponse, achievementsResponse, coursesResponse, sectionsResponse] = await Promise.all([
       axios.get('/follows/followUsers'),
-      axios.get('/achievements/getAchievements'),
+      axios.get('/achievements/acheived/getAchievements'),
       axios.get('/courses/getIds'),
       axios.get('/user/:u_id/section/:s_id')
     ]);
