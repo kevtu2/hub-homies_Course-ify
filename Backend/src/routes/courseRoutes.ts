@@ -207,12 +207,13 @@ router.get('/courses/:c_id', async (req, res) => {
                 "a": question.a1_text,
                 "b": question.a2_text,
                 "c": question.a3_text,
-                "d": question.a3_text
+                "d": question.a4_text
             };
             sectionPart.questions.push(questionPart);
         }
         courseJson.sections.push(sectionPart);
     }
+    res.status(200).send(courseJson);
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: 'Internal server error.' });
