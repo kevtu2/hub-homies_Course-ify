@@ -134,6 +134,10 @@ onMounted(async () => {
   await getCourseData(Number(route.params.id));
 });
 
+watch(route, async () => {
+  await getCourseData(Number(route.params.id));
+});
+
 </script>
 
 <style scoped>
