@@ -1,9 +1,11 @@
 <template>
   <div class="flex justify-center bg-gray-100">
     <div class="p-6 w-full max-w-screen-xl mx-auto bg-white shadow-lg border border-gray-200">
-      <h1 class="fancy-text">User Profile</h1>
+      <h1 class="text-3xl font-bold">
+        {{ profileNameText }}
+      </h1>
 
-      <div class="follower-count">
+      <div class="text-xl mt-2">
         Total Followers: {{ followers.length }}
       </div>
 
@@ -40,12 +42,18 @@
           </div>
         </AccordionTab>
         <AccordionTab header="Users">
-          <div class="grid grid-cols-6 gap-4">
+          <div class="grid grid-cols-5 gap-4">
             <Card v-for="user in users" :key="user.u_id" class="cursor-pointer">
-              <template #subtitle>
-                <div class="font-bold">
-                  {{ user.name }}
-                  <i class="pi pi-user"></i>
+              <template #content>
+                <div class="flex items-center justify-between">
+                  <div class="font-bold">
+                    {{ user.name }}
+                  </div>
+                  <Button 
+                  icon="pi pi-plus" 
+                  size="small" 
+                  rounded 
+                  />
                 </div>
               </template>
             </Card>
@@ -62,6 +70,7 @@ import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import Card from 'primevue/card';
 import axios from 'axios';
+import Button from 'primevue/button';
 import Cookies from 'js-cookie';
 
 import { useAuthStore } from '../stores/auth';
@@ -70,6 +79,14 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const authStore = useAuthStore();
+const isLoggedIn = computed(() => authStore.isLoggedIn)
+const profileNameText = computed(() => {
+  if(isLoggedIn.value) {
+    return authStore.username + "'s Profile";
+  } else {
+    return 'Profile';
+  }
+})
 
 interface Follower {
   f_id: number;
@@ -134,7 +151,7 @@ async function fetchData() {
       },
     });
     achievements.value = achievementsResponse.data;
-    
+    console.log(achievements.value);
     
     const coursesResponse = await axios.get('http://localhost:3000/api/courses/getIds');
     courses.value = coursesResponse.data;
