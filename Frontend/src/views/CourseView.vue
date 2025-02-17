@@ -143,10 +143,10 @@ const courseData = ref({
 const mapAnswer: {
   [key: string]: string;
 } = {
-  '1': 'A',
-  '2': 'B',
-  '3': 'C',
-  '4': 'D',
+  1: 'A',
+  2: 'B',
+  3: 'C',
+  4: 'D',
   'A': 'A',
   'B': 'B',
   'C': 'C',
@@ -166,7 +166,7 @@ const checkAnswerRoutine = (index: number, qIndex: number) => {
         return;
       }
       if (selectedAnswer.value !== null) {
-        if (propsedAnswer == realAnswer) {
+        if (mapAnswer[propsedAnswer] == realAnswer) {
           answerCorrectness.value[index][qIndex] = true;
         } else {
           answerCorrectness.value[index][qIndex] = false;
