@@ -161,22 +161,20 @@ body {
 }
 
 .fancy-text {
-  font-size: 3rem;
-  /* Large size for visibility */
-  font-weight: bold;
-  /* Bold text */
-  color: #228B22;
-  /* Green text color (center) */
+  font-size: 3rem; /* Large size for visibility */
+  font-weight: bold; /* Bold text */
+  color: #4A90E2; /* Modern blue text color */
 
-  /* Multiple shadows to create a gold outline around the green text */
-  text-shadow:
-    -2px 0 #E0C261,
-    2px 0 #E0C261,
-    0 2px #E0C261,
-    0 -2px #E0C261,
-    2px 2px #E0C261,
-    -2px -2px #E0C261,
-    2px -2px #E0C261,
-    -2px 2px #E0C261;
+  /* Multiple shadows to create a subtle blue outline around the text */
+  /* text-shadow:
+    -2px 0 #A2B9E8,
+    2px 0 #A2B9E8,
+    0 2px #A2B9E8,
+    0 -2px #A2B9E8,
+    2px 2px #A2B9E8,
+    -2px -2px #A2B9E8,
+    2px -2px #A2B9E8,
+    -2px 2px #A2B9E8; */
 }
+
 </style>
