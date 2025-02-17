@@ -20,15 +20,6 @@ interface DataItem {
   lang: string;
 }
 
-// Interface used for inserting Course into db
-//@ts-ignore
-interface Course {
-  u_id: string;
-  title: string;
-  subject: string;
-  link: string;
-  summary: string;
-}
 
 // ChatGPT prompt
 const prompt = `You will receive a body of text which is the transcription of an educational video. You will summarize and condense key concepts into different sections based on the course name and the transcription. DO NOT provide more than 10 sections. You will also provide 5 comprehensive multiple-choice questions and answers (THE "answer" FIELD MUST CORRESSPOND TO THE LETTER OF THE CORRECT OPTION) based on the concepts in the transcription for each topic. The field "course_summary" means the "discipline" it is in. For example, the course "CS50" has "course_subject" = "Computer Science". You must format your output as a JSON file like so:
@@ -109,7 +100,7 @@ router.post('/course', getDataOfToken, async (req, res) => {
         formatJson = formatJson.replace(/\\n/g, '\n');
       }
 
-      var courseJson;
+      let courseJson;
       console.log('Parsing Json..');
       if (formatJson != null) {
         courseJson = JSON.parse(formatJson);
@@ -156,23 +147,102 @@ router.get('/courses/getIds', async (req, res) => {
   }
 });
 
+// interface for questions
+interface Question {
+    question: string;
+    answer: string;
+    a: string;
+    b: string;
+    c: string;
+    d: string;
+}
+
+//interface for sections
+interface Section {
+    section: string;
+    summary: string;
+    questions: Question[]
+}
+
+// interface for courses
+interface Course {
+    course_name: string;
+    course_subject: string;
+    course_summary: string;
+    sections: Section[]
+}
 router.get('/courses/:c_id', async (req, res) => {
   try {
-    // const data = await db('Courses as c')
-    //   .select('c.*, s.*, q.*')
-    //   .leftJoin('sections as s', 'c.s_id', '=', 's.s_id')
-    //   .leftJoin('questions as q', 's.s_id', '=', 'q.s_id')
-    //   .where('c.c_id', Number(req.params.c_id))
-    //   .first();
-    const data = await db('courses as c')
-        .select('c.title', 'c.subject')
-        .where('c.c_id', '=', req.params.c_id)
+    
+    /**
+    {
+        "course_name": "COURSE_NAME",
+        "course_subject": "COURSE_SUBJECT",
+        "course_summary": "COURSE_SUMMARY",
+        "sections": [
+            {
+                "section": "SECTION_NAME",
+                "summary": "SECTION_SUMMARY",
+                "questions" : [
+                    "q1" : [
+                        "question" : "QUESTION",
+                        "answer" : "ANSWER"
+                        "a" : "OPTION1",
+                        "b" : "OPTION2",
+                        "c" : "OPTION3",
+                        "d" : "OPTION4"
+                    ]
+                    // ** UP TO q5 ** //
+                ]
+            }
+        ],
+    }
+    */
 
-    console.log("among us");
 
-    console.log(req.body.c_id);
-    console.log(req.body.u_id);
-    res.status(200).send(data);
+    const courseData = await db('courses as c')
+        .select('c.title', 'c.subject', 'c.c_text')
+        .where('c.c_id', '=', req.params.c_id);
+    
+    const sectionData = await db('sections as s')
+        .select('s.s_id', 's.s_name', 's.s_text')
+        .where('s.c_id', '=', req.params.c_id);
+
+    //@ts-ignore
+    let courseJson: Course = {
+        "course_name": courseData[0].title,
+        "course_subject": courseData[0].subject,
+        "course_summary": courseData[0].c_text,
+        "sections": []
+    }
+
+    for (let section of sectionData) {
+        let sectionPart:Section = {
+            "section": section.s_name,
+            "summary": section.s_text,
+            "questions": []
+        }
+        const questionData = await db('questions as q')
+            .select('q_text', 'q_ans', 'a1_text', 'a2_text', 'a3_text', 'a4_text')
+            .where('q.s_id', '=', section.s_id);
+        
+        for (let question of questionData) {
+            let questionPart:Question = {
+                "question": question.q_text,
+                "answer": question.q_ans,
+                "a": question.a1_text,
+                "b": question.a2_text,
+                "c": question.a3_text,
+                "d": question.a3_text
+            };
+            sectionPart.questions.push(questionPart);
+        }
+        courseJson.sections.push(sectionPart);
+    }
+    
+    console.log(courseJson);
+
+
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: 'Internal server error.' });
