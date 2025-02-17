@@ -36,7 +36,11 @@
                       <label for="answer4">{{ question.d }}</label>  
                     </div>
                   </div>
-                  <Button class="mt-4" label="Submit" size="small" v-if="!answerCorrectness[index][index2]" @click="checkAnswer(index, index2)" />
+                  <!-- <Button class="mt-4" label="Submit" size="small" v-if="!answerCorrectness[index][index2]" @click="checkAnswer(index, index2)" /> -->
+                  <Button class="w-40 m-8" type="submit" severity="secondary" label="Submit" v-if="!answerVisibility[index][index2]" @click="checkAnswer(index,index2)" />
+                  <Button v-if="answerVisibility[index][index2]" class="w-40 m-8" type="button" severity="secondary" label="Clear the answer" @click="clearAnswer(index,index2)" />
+                  <p v-if="answerVisibility[index][index2]&&!answerCorrectness[index][index2]" class="text-xl mt-5 mb-5">Incorret. Reference Answer: {{ question.answer }}</p>
+                  <p v-if="answerVisibility[index][index2]&&answerCorrectness[index][index2]" class="text-xl mt-5 mb-5">You are Correct!</p>
                   
                 </AccordionContent>
               </AccordionPanel>
@@ -87,6 +91,7 @@ const courseData = ref<Course | null>(null);
 
 const selectedAnswers = ref<(number | null)[][]>([]);
 const answerCorrectness = ref<boolean[][]>([]);
+const answerVisibility = ref<boolean[][]>([]);
 
 const answerToDigitMap: { [key: string]: number } = {
   "A": 1,
@@ -102,7 +107,8 @@ const checkAnswer = (index: number, qIndex: number) => {
   }
   const realAnswer = courseData.value.sections[index].questions[qIndex].answer;
   const proposedAnswer = selectedAnswers.value[index][qIndex];
-  if (selectedAnswers.value !== null) {
+  if (selectedAnswers.value[index][qIndex] !== null) {
+    answerVisibility.value[index][qIndex] = true;
     if (Number(proposedAnswer) === answerToDigitMap[realAnswer]) {
       answerCorrectness.value[index][qIndex] = true;
     } else {
@@ -114,10 +120,17 @@ const checkAnswer = (index: number, qIndex: number) => {
   }
 };
 
+const clearAnswer = (index: number, qIndex: number) => {
+  answerVisibility.value[index][qIndex] = false;
+  selectedAnswers.value[index][qIndex] = null;
+  answerCorrectness.value[index][qIndex] = false;
+};
+
 watch(courseData, (newVal) => {
   if (newVal) {
     selectedAnswers.value = newVal.sections.map(section => section.questions.map(() => null));
     answerCorrectness.value = newVal.sections.map(section => section.questions.map(() => false));
+    answerVisibility.value = newVal.sections.map(section => section.questions.map(() => false));
   }
 });
 
@@ -152,22 +165,20 @@ body {
 }
 
 .fancy-text {
-  font-size: 3rem;
-  /* Large size for visibility */
-  font-weight: bold;
-  /* Bold text */
-  color: #228B22;
-  /* Green text color (center) */
+  font-size: 3rem; /* Large size for visibility */
+  font-weight: bold; /* Bold text */
+  color: #4A90E2; /* Modern blue text color */
 
-  /* Multiple shadows to create a gold outline around the green text */
-  text-shadow:
-    -2px 0 #E0C261,
-    2px 0 #E0C261,
-    0 2px #E0C261,
-    0 -2px #E0C261,
-    2px 2px #E0C261,
-    -2px -2px #E0C261,
-    2px -2px #E0C261,
-    -2px 2px #E0C261;
+  /* Multiple shadows to create a subtle blue outline around the text */
+  /* text-shadow:
+    -2px 0 #A2B9E8,
+    2px 0 #A2B9E8,
+    0 2px #A2B9E8,
+    0 -2px #A2B9E8,
+    2px 2px #A2B9E8,
+    -2px -2px #A2B9E8,
+    2px -2px #A2B9E8,
+    -2px 2px #A2B9E8; */
 }
+
 </style>
