@@ -25,18 +25,25 @@
         </AccordionTab>
         <AccordionTab header="Courses">
           <div class="grid grid-cols-4 gap-4">
-            <Card v-for="course in courses" :key="course.c_id" @click="router.push('/course/' + course.c_id)" class="cursor-pointer">
+            <Card v-for="course in courses" :key="course.c_id">
               <template #title>
+                <div @click="router.push('/course/' + course.c_id)" class="cursor-pointer">
                 {{ course.title }}
                 <i class="pi pi-book"></i>
+                </div>
               </template>
               <template #subtitle>
-                {{ course.subject + " | " + new Date(course.added_date).toLocaleDateString() }}
+                <div @click="router.push('/course/' + course.c_id)" class="cursor-pointer">
+                  {{ course.subject + " | " + new Date(course.added_date).toLocaleDateString() }}
+                </div>
               </template>
               <template #content>
-                <div class="overflow-auto max-h-40">
+                <div @click="router.push('/course/' + course.c_id)" class="cursor-pointer overflow-auto max-h-40">
                   {{ course.c_text }}
                 </div>
+              </template>
+              <template #footer>
+                <Button icon="pi pi-share-alt" rounded variant="text" @click=copyCourse(course.c_id) />
               </template>
             </Card>
           </div>
@@ -87,6 +94,15 @@ const profileNameText = computed(() => {
     return "Guest's Dashboard";
   }
 })
+
+async function copyCourse(id : number) {
+  try {
+    await navigator.clipboard.writeText("http://localhost:5173/course/" + id.toString());
+    console.log('Course copied to clipboard:', id);
+  } catch (error) {
+    console.error('Failed to copy course:', error);
+  }
+}
 
 interface Follower {
   f_id: number;
