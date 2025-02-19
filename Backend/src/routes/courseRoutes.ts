@@ -25,7 +25,7 @@ interface DataItem {
 // ChatGPT prompt
 const prompt = `You will receive a body of text which is the transcription of an educational video. You will summarize and condense key concepts into different sections based on the course name. You MUST generate at least 300 words for the course summary and NO LESS than 150 words. DO NOT provide more than 10 sections and you MUST generate at least 300 words for each section summary and NO LESS than 150 words. You will also provide 5 comprehensive multiple-choice questions and answers (THE "answer" FIELD MUST CORRESPOND TO THE LETTER OF THE CORRECT OPTION) based on the concepts in the transcription for each topic. The field "course_summary" means the "discipline" it is in. For example, the course "CS50" has "course_subject" = "Computer Science". You must format your output as a JSON file like so:
 
-(EXAMPLE)
+(EXAMPLE - Make sure to return it in this EXACT format)
 {
     "course_name": "COURSE_NAME",
     "course_subject": "COURSE_SUBJECT",
@@ -35,15 +35,15 @@ const prompt = `You will receive a body of text which is the transcription of an
             "section": "SECTION_NAME",
             "summary": "SECTION_SUMMARY",
             "questions" : [
-                "q1" : [
+                "{
                     "question" : "QUESTION",
                     "answer" : "ANSWER"
                     "a" : "OPTION1",
                     "b" : "OPTION2",
                     "c" : "OPTION3",
                     "d" : "OPTION4"
-                ]
-                // ** UP TO q5 ** //
+                }
+                // ** UP TO 5 questions ** //
             ]
         }
     ],
@@ -73,9 +73,9 @@ router.post('/course', getDataOfToken, async (req, res) => {
 
     // Query ChatGPT 4o-mini
     if (transcription != null) {
-        console.log("Asking gpt-4o-mini..");
+      console.log("Asking gpt-4o-mini..");
       const completion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         messages: [
           { role: 'system', content: prompt },
           {
